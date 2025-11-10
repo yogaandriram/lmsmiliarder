@@ -86,12 +86,18 @@ id int [pk, increment]
 name varchar [unique, not null, note: 'Nama kategori (misal: "Pemrograman Web").']
 slug varchar [unique, not null, note: 'Versi URL-friendly dari nama.']
 description text [note: 'Deskripsi singkat kategori.']
+is_active boolean [not null, default: true, note: 'Status aktif kategori.']
+created_at timestamp [not null]
+updated_at timestamp [not null]
 }
 
 Table tags {
 id int [pk, increment]
 name varchar [unique, not null, note: 'Nama tag (misal: "PHP", "Laravel").']
 slug varchar [unique, not null, note: 'Versi URL-friendly dari nama.']
+is_active boolean [not null, default: true, note: 'Status aktif tag.']
+created_at timestamp [not null]
+updated_at timestamp [not null]
 }
 
 Table courses {

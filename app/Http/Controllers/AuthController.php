@@ -28,7 +28,11 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials, $remember)) {
             $request->session()->regenerate();
-            return redirect()->intended('/');
+            $user = Auth::user();
+            $fallback = ($user && ($user->role === 'admin'))
+                ? route('admin.dashboard')
+                : route('home');
+            return redirect()->intended($fallback);
         }
 
         return back()->withErrors([

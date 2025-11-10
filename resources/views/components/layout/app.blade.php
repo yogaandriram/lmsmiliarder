@@ -25,7 +25,7 @@
   </head>
   <body class="min-h-screen bg-gradient-to-br from-neutral-100 via-white to-neutral-200 text-gray-900
                dark:from-neutral-900 dark:via-black dark:to-neutral-800 dark:text-gray-100">
-    @include('layouts.partials.navbar')
+@include('components.layout.navbar')
 
     <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       @yield('content')

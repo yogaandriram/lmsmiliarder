@@ -25,7 +25,7 @@
 </head>
 <body class="min-h-screen bg-gradient-to-br from-neutral-100 via-white to-neutral-200 text-gray-900
              dark:from-neutral-900 dark:via-black dark:to-neutral-800 dark:text-gray-100">
-    @include('layouts.partials.navbar')
+@include('components.layout.navbar')
 
     <main class="max-w-lg mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <h1 class="text-center text-4xl font-semibold text-yellow-400 mb-6">EduLux LMS</h1>

@@ -1,4 +1,4 @@
-@extends('layouts.auth')
+@extends('components.layout.auth')
 
 @section('content')
 <form method="POST" action="{{ route('password.email') }}" class="space-y-4 text-gray-900 dark:text-gray-100">
