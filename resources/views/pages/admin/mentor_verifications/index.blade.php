@@ -20,7 +20,7 @@
                 <td class="py-2">
                     <form method="POST" action="{{ route('admin.mentor_verifications.approve', $v) }}" class="inline">
                         @csrf
-                        <x-ui.button.primary type="submit" size="sm">Approve</x-ui.button.primary>
+        <x-ui.btn-primary type="submit" size="sm">Approve</x-ui.btn-primary>
                     </form>
                     <form method="POST" action="{{ route('admin.mentor_verifications.reject', $v) }}" class="inline ml-2">
                         @csrf

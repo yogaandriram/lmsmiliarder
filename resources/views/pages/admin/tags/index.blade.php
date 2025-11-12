@@ -4,7 +4,7 @@
 @section('content')
 <div class="flex items-center justify-between mb-6">
   <h2 class="text-2xl font-semibold">Kelola Tag</h2>
-  <x-ui.button.primary href="{{ route('admin.tags.create') }}">Tambah Tag</x-ui.button.primary>
+        <x-ui.btn-primary href="{{ route('admin.tags.create') }}">Tambah Tag</x-ui.btn-primary>
 </div>
 
 <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6">
@@ -22,7 +22,7 @@
   </x-slot:header>
 
   <x-slot:actions>
-    <x-ui.button.secondary href="{{ route('admin.tags.create') }}" size="sm">Tambah Tag</x-ui.button.secondary>
+        <x-ui.btn-secondary href="{{ route('admin.tags.create') }}" size="sm">Tambah Tag</x-ui.btn-secondary>
   </x-slot:actions>
 
   @forelse($tags as $t)

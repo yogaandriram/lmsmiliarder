@@ -25,6 +25,8 @@
             $pageTitle = 'Rekening Admin';
         } elseif (request()->routeIs('admin.announcements.*')) {
             $pageTitle = 'Pengumuman';
+        } elseif (request()->routeIs('admin.settings.*')) {
+            $pageTitle = 'Pengaturan';
         } elseif (request()->routeIs('admin.dashboard')) {
             $pageTitle = 'Dashboard';
         } else {

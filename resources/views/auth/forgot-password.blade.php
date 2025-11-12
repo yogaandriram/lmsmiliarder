@@ -19,7 +19,7 @@
         <p class="text-red-600 dark:text-red-400 text-sm">{{ $message }}</p>
     @enderror
 
-    <button type="submit" class="w-full bg-yellow-400 text-black font-semibold rounded-lg px-4 py-2 hover:bg-yellow-300">Kirim Link</button>
+    <x-ui.btn-primary type="submit" class="w-full justify-center">Kirim Link</x-ui.btn-primary>
     <p class="text-gray-600 dark:text-gray-400 text-sm">Ingat kata sandi? <a href="{{ route('login') }}" class="text-yellow-400 hover:text-yellow-300">Masuk</a></p>
 </form>
 @endsection

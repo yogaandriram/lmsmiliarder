@@ -20,7 +20,7 @@
                     <option value="success">Setujui</option>
                     <option value="failed">Tolak</option>
                 </select>
-                <x-ui.button.primary type="submit">Update</x-ui.button.primary>
+        <x-ui.btn-primary type="submit">Update</x-ui.btn-primary>
             </form>
         </div>
         <div class="mt-4">

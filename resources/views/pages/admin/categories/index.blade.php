@@ -4,7 +4,7 @@
 @section('content')
 <div class="flex items-center justify-between mb-6">
     <h2 class="text-2xl font-semibold">Kelola Kategori</h2>
-    <x-ui.button.primary href="{{ route('admin.categories.create') }}">Tambah Kategori</x-ui.button.primary>
+        <x-ui.btn-primary href="{{ route('admin.categories.create') }}">Tambah Kategori</x-ui.btn-primary>
 </div>
 
 @php

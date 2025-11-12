@@ -16,7 +16,7 @@
 @endif
 <div class="relative">
   <textarea {{ $attributes->merge(['class' => $baseClass]) }} name="{{ $name }}" rows="{{ $rows }}">{{ $slot }}</textarea>
-</div>
+  </div>
 @error($name)
   <p class="text-red-600 dark:text-red-400 text-sm">{{ $message }}</p>
 @enderror

@@ -25,7 +25,7 @@
         <p class="text-red-400 text-sm">{{ $message }}</p>
     @enderror
 
-    <button type="submit" class="w-full bg-yellow-400 text-black font-semibold rounded-lg px-4 py-2 hover:bg-yellow-300">Kirim Link</button>
+    <x-ui.btn-primary type="submit" class="w-full justify-center">Kirim Link</x-ui.btn-primary>
 </form>
 
 <div class="flex items-center justify-between mt-3">
@@ -33,7 +33,7 @@
     <form id="resendForm" method="POST" action="{{ route('otp.request') }}" class="flex items-center gap-3">
         @csrf
         <input type="hidden" name="email" value="{{ $email ?? old('email') }}" />
-        <button type="submit" class="border border-gray-300 text-gray-700 rounded-lg px-3 py-2 hover:border-yellow-400 hover:text-yellow-500 disabled:opacity-50 dark:border-white/20 dark:text-gray-200 dark:hover:text-yellow-400" id="resendBtn" data-seconds="{{ isset($remainingSeconds) ? max(0, (int)$remainingSeconds) : 60 }}" disabled>Kirim Ulang OTP</button>
+        <x-ui.btn-secondary type="submit" size="sm" class="disabled:opacity-50 justify-center" id="resendBtn" data-seconds="{{ isset($remainingSeconds) ? max(0, (int)$remainingSeconds) : 60 }}" disabled>Kirim Ulang OTP</x-ui.btn-secondary>
         <span class="text-gray-600 dark:text-gray-400 text-sm" id="countdownText">Kirim Ulang Dalam 0:{{ str_pad(($remainingSeconds ?? 60) % 60, 2, '0', STR_PAD_LEFT) }}</span>
     </form>
 </div>

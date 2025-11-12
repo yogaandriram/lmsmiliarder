@@ -15,11 +15,17 @@
                 <x-ui.navbar.admin.search />
             </div>
 
-            <!-- Kanan: Notification, Pengaturan, Profile (Reusable buttons) -->
+            <!-- Kanan: Notification, Pengaturan, Profile, Logout -->
             <div class="flex items-center gap-3">
-                <x-ui.navbar.admin.button icon="fa-regular fa-bell" variant="glass" />
-                <x-ui.navbar.admin.button icon="fa-solid fa-gear" variant="glass" />
-                <x-ui.navbar.admin.button icon="fa-solid fa-user" variant="glass" />
+                <x-ui.navbar.admin.button icon="fa-regular fa-bell" variant="glass" href="{{ route('admin.announcements.index') }}" />
+                <x-ui.navbar.admin.button icon="fa-solid fa-gear" variant="glass" href="{{ route('admin.settings.index') }}" />
+                <x-ui.navbar.admin.button icon="fa-solid fa-user" variant="glass" href="{{ route('admin.profile') }}" />
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button type="submit" class="h-10 w-10 flex items-center justify-center rounded-xl glass glass-hover ring-1 ring-yellow-300/25" title="Logout">
+                        <i class="fa-solid fa-right-from-bracket text-white"></i>
+                    </button>
+                </form>
             </div>
         </div>
     </div>

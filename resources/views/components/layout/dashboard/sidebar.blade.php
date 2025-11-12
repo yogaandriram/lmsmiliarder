@@ -7,6 +7,7 @@
   $isDashboard = request()->routeIs('admin.dashboard');
   $isCategories = request()->routeIs('admin.categories.*');
   $isTags = request()->routeIs('admin.tags.*');
+  $isUsers = request()->routeIs('admin.users.*');
   $isMentorVerify = request()->routeIs('admin.mentor_verifications.*');
   $isTransactions = request()->routeIs('admin.transactions.*');
 @endphp
@@ -31,7 +32,7 @@
     </x-ui.sidebar.section>
 
     <x-ui.sidebar.section title="Manage Account">
-      <x-ui.sidebar.item href="#" icon="fa-solid fa-user-group" label="Kelola User" />
+      <x-ui.sidebar.item href="{{ route('admin.users.index') }}" icon="fa-solid fa-user-group" label="Kelola User" :active="$isUsers" />
       <x-ui.sidebar.item href="#" icon="fa-solid fa-user-tie" label="Kelola Mentor" />
       <x-ui.sidebar.item href="{{ route('admin.mentor_verifications.index') }}" icon="fa-solid fa-user-check" label="Verifikasi Mentor" :active="$isMentorVerify" />
     </x-ui.sidebar.section>
@@ -43,17 +44,9 @@
     </x-ui.sidebar.section>
 
     <x-ui.sidebar.section title="Manage Notifications">
-      <x-ui.sidebar.item href="#" icon="fa-solid fa-bell" label="Notification" />
       <x-ui.sidebar.item href="{{ route('admin.announcements.index') }}" icon="fa-solid fa-bullhorn" label="Pengumuman" />
     </x-ui.sidebar.section>
 
-    <x-ui.sidebar.section title="Account Settings">
-      <x-ui.sidebar.item href="#" icon="fa-solid fa-gear" label="Settings" />
-      <x-ui.sidebar.item href="#" icon="fa-solid fa-user" label="Profile" />
-      <form method="POST" action="{{ route('logout') }}" class="mt-2">
-        @csrf
-        <x-ui.sidebar.button icon="fa-solid fa-arrow-right-from-bracket" label="Log Out" />
-      </form>
-    </x-ui.sidebar.section>
+    
   </nav>
 </div>

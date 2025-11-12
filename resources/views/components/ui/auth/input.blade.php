@@ -6,15 +6,13 @@
   'placeholder' => null,
   'value' => null,
   'required' => false,
-  'variant' => 'default', // default | glass
   'showToggle' => false,
 ])
 
 @php
   $hasIcon = (bool) $icon;
-  $baseDefault = 'w-full py-2 '.($hasIcon ? 'pl-8' : 'pl-3').' rounded-lg border bg-white text-gray-900 placeholder-gray-400 border-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-500 dark:bg-neutral-900 dark:text-gray-100 dark:placeholder-gray-500 dark:border-white/10 dark:focus:ring-yellow-400';
-  $baseGlass = 'w-full p-2 rounded bg-white/10 border border-white/20';
-  $baseClass = $variant === 'glass' ? $baseGlass : $baseDefault;
+  // Styling khusus halaman auth, sedikit lebih ringkas
+  $baseClass = 'w-full py-2 '.($hasIcon ? 'pl-9' : 'pl-3').' pr-3 rounded-lg border bg-white text-gray-900 placeholder-gray-400 border-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-500 dark:bg-neutral-900 dark:text-gray-100 dark:placeholder-gray-500 dark:border-white/10 dark:focus:ring-yellow-400';
 @endphp
 
 @if($label)
@@ -34,7 +32,7 @@
   />
 
   @if($showToggle)
-    <button type="button" aria-label="Tampilkan/Sembunyikan" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-yellow-500 dark:text-gray-400 dark:hover:text-yellow-400" onclick="toggleInputVisibility(this)">
+    <button type="button" aria-label="Tampilkan/Sembunyikan" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-yellow-500 dark:text-gray-400 dark:hover:text-yellow-400" onclick="toggleAuthInputVisibility(this)">
       <i class="fa-solid fa-eye"></i>
     </button>
   @endif
@@ -44,11 +42,11 @@
 @enderror
 
 <script>
-// Safeguard to avoid redefining in multiple component renders
+// Hindari redefinisi saat komponen dirender berkali-kali
 (function(){
-  if(window.__edulux_toggle_loaded) return; 
-  window.__edulux_toggle_loaded = true;
-  window.toggleInputVisibility = function(btn){
+  if(window.__auth_toggle_loaded) return;
+  window.__auth_toggle_loaded = true;
+  window.toggleAuthInputVisibility = function(btn){
     const input = btn.previousElementSibling;
     if(!input) return;
     const icon = btn.querySelector('i');

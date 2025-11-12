@@ -11,6 +11,8 @@ use App\Http\Controllers\Admin\MentorVerificationController;
 use App\Http\Controllers\Admin\TransactionController as AdminTransactionController;
 use App\Http\Controllers\Admin\AnnouncementController;
 use App\Http\Controllers\Admin\AdminBankAccountController;
+use App\Http\Controllers\Admin\UserController as AdminUserController;
+use App\Http\Controllers\Admin\SettingsController as AdminSettingsController;
 
 Route::get('/', function () {
     return view('home');
@@ -41,6 +43,9 @@ Route::middleware(['auth','admin'])
     ->group(function () {
         Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
+        // Profil admin
+        Route::get('/profile', [AdminUserController::class, 'profile'])->name('profile');
+
         // Kategori & Tag
         Route::resource('categories', AdminCategoryController::class)->only(['index','create','store','edit','update','destroy']);
         Route::resource('tags', AdminTagController::class)->only(['index','create','store','edit','update','destroy']);
@@ -63,4 +68,10 @@ Route::middleware(['auth','admin'])
 
         // Rekening bank admin
         Route::resource('admin-bank-accounts', AdminBankAccountController::class)->only(['index','store','destroy']);
+
+        // Kelola User
+        Route::resource('users', AdminUserController::class)->only(['index','create','store','show','edit','update','destroy']);
+
+        // Settings
+        Route::get('settings', [AdminSettingsController::class, 'index'])->name('settings.index');
     });

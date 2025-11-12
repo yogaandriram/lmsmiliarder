@@ -9,12 +9,12 @@
         <form method="POST" action="{{ route('admin.announcements.store') }}">
             @csrf
             <div class="mb-3">
-    <x-form.input variant="glass" label="Judul" name="title" type="text" value="{{ old('title') }}" required />
+    <x-ui.crud.input variant="glass" label="Judul" name="title" type="text" value="{{ old('title') }}" required />
             </div>
             <div class="mb-3">
-    <x-form.textarea variant="glass" label="Konten" name="content" rows="5">{{ old('content') }}</x-form.textarea>
+    <x-ui.crud.textarea variant="glass" label="Konten" name="content" rows="5">{{ old('content') }}</x-ui.crud.textarea>
             </div>
-            <x-ui.button.primary type="submit">Simpan</x-ui.button.primary>
+        <x-ui.btn-primary type="submit">Simpan</x-ui.btn-primary>
         </form>
     </div>
 

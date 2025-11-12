@@ -9,20 +9,20 @@
         <form method="POST" action="{{ route('admin.admin-bank-accounts.store') }}">
             @csrf
             <div class="mb-3">
-    <x-form.input variant="glass" label="Nama Bank" name="bank_name" type="text" value="{{ old('bank_name') }}" required />
+    <x-ui.crud.input variant="glass" label="Nama Bank" name="bank_name" type="text" value="{{ old('bank_name') }}" required />
             </div>
             <div class="mb-3">
-    <x-form.input variant="glass" label="Nomor Rekening" name="account_number" type="text" value="{{ old('account_number') }}" required />
+    <x-ui.crud.input variant="glass" label="Nomor Rekening" name="account_number" type="text" value="{{ old('account_number') }}" required />
             </div>
             <div class="mb-3">
-    <x-form.input variant="glass" label="Nama Pemilik" name="account_name" type="text" value="{{ old('account_name') }}" required />
+    <x-ui.crud.input variant="glass" label="Nama Pemilik" name="account_name" type="text" value="{{ old('account_name') }}" required />
             </div>
             <div class="mb-3">
                 <label class="inline-flex items-center">
                     <input type="checkbox" name="is_active" class="mr-2"> Aktif
                 </label>
             </div>
-            <x-ui.button.primary type="submit">Simpan</x-ui.button.primary>
+        <x-ui.btn-primary type="submit">Simpan</x-ui.btn-primary>
         </form>
     </div>
 

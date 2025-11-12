@@ -4,7 +4,7 @@
 @section('content')
 <div class="flex items-center justify-between mb-6">
   <h2 class="text-2xl font-semibold">Edit Tag</h2>
-  <x-ui.button.secondary href="{{ route('admin.tags.index') }}">Kembali</x-ui.button.secondary>
+        <x-ui.btn-secondary href="{{ route('admin.tags.index') }}">Kembali</x-ui.btn-secondary>
 </div>
 
 <div class="glass p-6 rounded max-w-2xl">
@@ -12,7 +12,7 @@
     @csrf
     @method('PUT')
     <div class="mb-3">
-      <x-form.input variant="glass" label="Nama" name="name" type="text" value="{{ old('name', $tag->name) }}" required />
+      <x-ui.crud.input variant="glass" label="Nama" name="name" type="text" value="{{ old('name', $tag->name) }}" required />
     </div>
     <div class="mb-4">
       <label class="flex items-center gap-3 select-none">
@@ -21,8 +21,8 @@
         <span class="text-sm text-white/80">Aktif</span>
       </label>
     </div>
-    <x-ui.button.primary type="submit">Simpan Perubahan</x-ui.button.primary>
-    <x-ui.button.secondary href="{{ route('admin.tags.index') }}" class="ml-2">Batal</x-ui.button.secondary>
+        <x-ui.btn-primary type="submit">Simpan Perubahan</x-ui.btn-primary>
+        <x-ui.btn-secondary href="{{ route('admin.tags.index') }}" class="ml-2">Batal</x-ui.btn-secondary>
   </form>
 </div>
 @endsection

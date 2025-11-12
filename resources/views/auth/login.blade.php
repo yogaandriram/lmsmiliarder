@@ -5,12 +5,12 @@
     @csrf
     <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100">Masuk ke Akun Anda</h2>
 
-<x-form.input label="Email" name="email" type="email" value="{{ old('email') }}" placeholder="email@gmail.com" icon="fa-solid fa-envelope" required />
+<x-ui.auth.input label="Email" name="email" type="email" value="{{ old('email') }}" placeholder="email@gmail.com" icon="fa-solid fa-envelope" required />
     @error('email')
         <p class="text-red-600 dark:text-red-400 text-sm">{{ $message }}</p>
     @enderror
 
-<x-form.input label="Kata Sandi" name="password" type="password" placeholder="********" icon="fa-solid fa-lock" required showToggle="true" />
+<x-ui.auth.input label="Kata Sandi" name="password" type="password" placeholder="********" icon="fa-solid fa-lock" required showToggle="true" />
     @error('password')
         <p class="text-red-600 dark:text-red-400 text-sm">{{ $message }}</p>
     @enderror
@@ -22,7 +22,7 @@
         <a href="{{ route('password.forgot') }}" class="text-gray-600 hover:text-yellow-600 dark:text-gray-400 dark:hover:text-yellow-400">Lupa Kata Sandi?</a>
     </div>
 
-    <button type="submit" class="w-full bg-yellow-400 text-black font-semibold rounded-lg px-4 py-2 hover:bg-yellow-300">Masuk</button>
+    <x-ui.btn-primary type="submit" class="w-full justify-center">Masuk</x-ui.btn-primary>
 
     <div class="flex items-center gap-3 text-gray-600 dark:text-gray-400">
         <div class="h-px bg-gray-300 dark:bg-white/10 w-full"></div>
@@ -30,9 +30,7 @@
         <div class="h-px bg-gray-300 dark:bg-white/10 w-full"></div>
     </div>
 
-    <button type="button" class="w-full border border-gray-300 text-gray-700 rounded-lg px-4 py-2 hover:border-yellow-400 hover:text-yellow-500 dark:border-white/20 dark:text-gray-200 dark:hover:text-yellow-400">
-        <i class="fa-brands fa-google mr-2"></i> Akun Google
-    </button>
+    <x-ui.btn-secondary type="button" class="w-full justify-center" icon="fa-brands fa-google">Akun Google</x-ui.btn-secondary>
 
     <div class="align-center text-center">
         <p class="text-gray-600 dark:text-gray-400 text-sm">Belum punya akun? <a href="{{ route('register') }}" class="text-yellow-400 hover:text-yellow-300">Registrasi Sekarang</a></p>
