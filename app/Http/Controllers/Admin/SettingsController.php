@@ -8,6 +8,8 @@ class SettingsController extends Controller
 {
     public function index()
     {
-        return view('pages.admin.settings.index');
+        $members = \App\Models\User::orderBy('name')->get();
+        $accounts = \App\Models\AdminBankAccount::orderBy('bank_name')->get();
+        return view('pages.admin.settings.index', compact('members','accounts'));
     }
 }

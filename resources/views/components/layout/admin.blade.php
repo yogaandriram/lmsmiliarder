@@ -21,6 +21,8 @@
             $pageTitle = 'Verifikasi Mentor';
         } elseif (request()->routeIs('admin.transactions.*')) {
             $pageTitle = 'Transaksi';
+        } elseif (request()->routeIs('admin.course_verifications.*')) {
+            $pageTitle = 'Verifikasi Kursus';
         } elseif (request()->routeIs('admin.admin-bank-accounts.*')) {
             $pageTitle = 'Rekening Admin';
         } elseif (request()->routeIs('admin.announcements.*')) {

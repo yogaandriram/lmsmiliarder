@@ -7,29 +7,31 @@
     <table class="w-full text-left">
         <thead>
             <tr>
-                <th class="py-2">User</th>
+                <th class="py-2">Nama</th>
+                <th class="py-2">Email</th>
                 <th class="py-2">Dokumen</th>
                 <th class="py-2">Aksi</th>
             </tr>
         </thead>
         <tbody>
-        @forelse($pending as $v)
+        @forelse($pendingUsers as $user)
             <tr class="border-t border-white/10">
-                <td class="py-2">{{ $v->user?->name }} ({{ $v->user?->email }})</td>
-                <td class="py-2"><a href="{{ $v->document_url }}" class="text-yellow-300" target="_blank">Lihat Dokumen</a></td>
+                <td class="py-2">{{ $user->name }}</td>
+                <td class="py-2">{{ $user->email }}</td>
+                <td class="py-2"><a href="{{ route('admin.mentor_verifications.show', $user) }}" class="text-yellow-300">Lihat Dokumen</a></td>
                 <td class="py-2">
-                    <form method="POST" action="{{ route('admin.mentor_verifications.approve', $v) }}" class="inline">
+                    <form method="POST" action="{{ route('admin.mentor_verifications.approve_user', $user) }}" class="inline">
                         @csrf
-        <x-ui.btn-primary type="submit" size="sm">Approve</x-ui.btn-primary>
+                        <x-ui.btn-primary type="submit" size="sm">Approve</x-ui.btn-primary>
                     </form>
-                    <form method="POST" action="{{ route('admin.mentor_verifications.reject', $v) }}" class="inline ml-2">
+                    <form method="POST" action="{{ route('admin.mentor_verifications.reject_user', $user) }}" class="inline ml-2">
                         @csrf
                         <button class="px-3 py-1 bg-red-500 text-white rounded">Reject</button>
                     </form>
                 </td>
             </tr>
         @empty
-            <tr><td colspan="3" class="py-3 text-white/70">Tidak ada pengajuan pending.</td></tr>
+            <tr><td colspan="4" class="py-3 text-white/70">Tidak ada pengajuan pending.</td></tr>
         @endforelse
         </tbody>
     </table>

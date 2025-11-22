@@ -9,6 +9,7 @@
   $isTags = request()->routeIs('admin.tags.*');
   $isUsers = request()->routeIs('admin.users.*');
   $isMentorVerify = request()->routeIs('admin.mentor_verifications.*');
+  $isCourseVerify = request()->routeIs('admin.course_verifications.*');
   $isTransactions = request()->routeIs('admin.transactions.*');
 @endphp
 
@@ -27,7 +28,7 @@
     </x-ui.sidebar.section>
 
     <x-ui.sidebar.section title="Content Verification">
-      <x-ui.sidebar.item href="#" icon="fa-solid fa-book-open" label="Kursus" />
+      <x-ui.sidebar.item href="{{ route('admin.course_verifications.index') }}" icon="fa-solid fa-book-open" label="Kursus" :active="$isCourseVerify" />
       <x-ui.sidebar.item href="#" icon="fa-solid fa-book" label="E-Book" />
     </x-ui.sidebar.section>
 
@@ -40,7 +41,7 @@
     <x-ui.sidebar.section title="Manage Transaksi">
       <x-ui.sidebar.item href="#" icon="fa-solid fa-credit-card" label="Berlangganan" />
       <x-ui.sidebar.item href="{{ route('admin.transactions.pending') }}" icon="fa-solid fa-money-check-dollar" label="Transaksi" :active="$isTransactions" />
-      <x-ui.sidebar.item href="{{ route('admin.admin-bank-accounts.index') }}" icon="fa-solid fa-building-columns" label="Rekening Admin" />
+      <x-ui.sidebar.item href="{{ route('admin.settings.index') }}" icon="fa-solid fa-building-columns" label="Rekening Admin" />
     </x-ui.sidebar.section>
 
     <x-ui.sidebar.section title="Manage Notifications">

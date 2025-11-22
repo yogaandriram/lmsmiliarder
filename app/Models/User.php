@@ -48,4 +48,52 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    /**
+     * Get the courses created by this user (mentor).
+     */
+    public function courses()
+    {
+        return $this->hasMany(Course::class, 'author_id');
+    }
+
+    /**
+     * Get the ebooks created by this user (mentor).
+     */
+    public function ebooks()
+    {
+        return $this->hasMany(Ebook::class, 'author_id');
+    }
+
+    /**
+     * Get the enrollments for this user.
+     */
+    public function enrollments()
+    {
+        return $this->hasMany(Enrollment::class);
+    }
+
+    /**
+     * Get the mentor verification for this user.
+     */
+    public function mentorVerification()
+    {
+        return $this->hasOne(MentorVerification::class);
+    }
+
+    /**
+     * Get the transactions for this user.
+     */
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class);
+    }
+
+    /**
+     * Get the user ebook library entries for this user.
+     */
+    public function userEbookLibraries()
+    {
+        return $this->hasMany(UserEbookLibrary::class);
+    }
 }

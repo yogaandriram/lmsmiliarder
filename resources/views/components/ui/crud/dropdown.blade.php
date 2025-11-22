@@ -14,7 +14,7 @@
 @endphp
 
 @if($label)
-  <label class="block text-sm text-gray-700 dark:text-gray-300">{{ $label }}</label>
+  <label class="block text-sm font-medium text-white/90 mb-2">{{ $label }}</label>
 @endif
 <div class="relative">
   <select name="{{ $name }}" @if($required) required @endif class="{{ $baseClass }}">

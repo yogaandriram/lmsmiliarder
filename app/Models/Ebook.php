@@ -12,4 +12,28 @@ class Ebook extends Model
     protected $fillable = [
         'author_id','title','slug','description','cover_image_url','file_url','price','status'
     ];
+
+    /**
+     * Get the author (mentor) of the ebook.
+     */
+    public function author()
+    {
+        return $this->belongsTo(User::class, 'author_id');
+    }
+
+    /**
+     * Get the transaction details for the ebook.
+     */
+    public function transactionDetails()
+    {
+        return $this->hasMany(TransactionDetail::class);
+    }
+
+    /**
+     * Get the user ebook library entries for this ebook.
+     */
+    public function userEbookLibraries()
+    {
+        return $this->hasMany(UserEbookLibrary::class);
+    }
 }

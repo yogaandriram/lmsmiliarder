@@ -9,5 +9,5 @@ class AdminBankAccount extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['bank_name','account_number','account_name','is_active'];
+    protected $fillable = ['bank_name','account_number','account_holder_name','is_active'];
 }

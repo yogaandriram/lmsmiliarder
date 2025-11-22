@@ -9,10 +9,12 @@ use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Admin\TagController as AdminTagController;
 use App\Http\Controllers\Admin\MentorVerificationController;
 use App\Http\Controllers\Admin\TransactionController as AdminTransactionController;
+use App\Http\Controllers\Admin\CourseVerificationController;
 use App\Http\Controllers\Admin\AnnouncementController;
 use App\Http\Controllers\Admin\AdminBankAccountController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\SettingsController as AdminSettingsController;
+use App\Http\Controllers\Mentor\DashboardController as MentorDashboardController;
 
 Route::get('/', function () {
     return view('home');
@@ -59,6 +61,13 @@ Route::middleware(['auth','admin'])
         Route::post('mentor-verifications/{verification}/approve', [MentorVerificationController::class, 'approve'])->name('mentor_verifications.approve');
         Route::post('mentor-verifications/{verification}/reject', [MentorVerificationController::class, 'reject'])->name('mentor_verifications.reject');
 
+        // Verifikasi Kursus
+        Route::get('course-verifications', [CourseVerificationController::class, 'index'])->name('course_verifications.index');
+        Route::get('course-verifications/{course}', [CourseVerificationController::class, 'show'])->name('course_verifications.show');
+        Route::get('course-verifications/{course}/lessons/{lesson}', [CourseVerificationController::class, 'showLesson'])->name('course_verifications.lessons.show');
+        Route::post('course-verifications/{course}/approve', [CourseVerificationController::class, 'approve'])->name('course_verifications.approve');
+        Route::post('course-verifications/{course}/reject', [CourseVerificationController::class, 'reject'])->name('course_verifications.reject');
+
         // Transaksi - verifikasi pembayaran
         Route::get('transactions/pending', [AdminTransactionController::class, 'pending'])->name('transactions.pending');
         Route::post('transactions/{transaction}/verify', [AdminTransactionController::class, 'verify'])->name('transactions.verify');
@@ -67,7 +76,7 @@ Route::middleware(['auth','admin'])
         Route::resource('announcements', AnnouncementController::class)->only(['index','store','destroy']);
 
         // Rekening bank admin
-        Route::resource('admin-bank-accounts', AdminBankAccountController::class)->only(['index','store','destroy']);
+        Route::resource('admin-bank-accounts', AdminBankAccountController::class)->only(['store','update','destroy']);
 
         // Kelola User
         Route::resource('users', AdminUserController::class)->only(['index','create','store','show','edit','update','destroy']);
@@ -75,3 +84,60 @@ Route::middleware(['auth','admin'])
         // Settings
         Route::get('settings', [AdminSettingsController::class, 'index'])->name('settings.index');
     });
+
+// Mentor routes
+Route::middleware(['auth','role:mentor'])
+    ->prefix('mentor')
+    ->name('mentor.')
+    ->group(function () {
+        Route::get('/', [MentorDashboardController::class, 'index'])->name('dashboard');
+        
+        // Course Management
+        Route::resource('courses', \App\Http\Controllers\Mentor\CourseController::class);
+        Route::get('courses/{course}/modules/{module}', [\App\Http\Controllers\Mentor\CourseController::class, 'showModule'])->name('courses.modules.show');
+        Route::post('courses/{course}/modules/{module}/lessons', [\App\Http\Controllers\Mentor\CourseController::class, 'storeLesson'])->name('courses.modules.lessons.store');
+        Route::get('courses/{course}/modules/{module}/lessons/{lesson}', [\App\Http\Controllers\Mentor\CourseController::class, 'showLesson'])->name('courses.modules.lessons.show');
+        Route::put('courses/{course}/modules/{module}/lessons/{lesson}', [\App\Http\Controllers\Mentor\CourseController::class, 'updateLesson'])->name('courses.modules.lessons.update');
+        Route::delete('courses/{course}/modules/{module}/lessons/{lesson}', [\App\Http\Controllers\Mentor\CourseController::class, 'destroyLesson'])->name('courses.modules.lessons.destroy');
+        Route::post('courses/{course}/modules', [\App\Http\Controllers\Mentor\CourseController::class, 'storeModule'])->name('courses.modules.store');
+        
+        // Ebook Management
+        Route::resource('ebooks', \App\Http\Controllers\Mentor\EbookController::class);
+
+        // Navbar pages
+        Route::view('notifications', 'pages.mentor.notifications')->name('notifications');
+        Route::view('settings', 'pages.mentor.settings')->name('settings');
+        Route::get('profile', \App\Http\Controllers\Mentor\ProfileController::class.'@edit')->name('profile');
+        Route::post('profile', \App\Http\Controllers\Mentor\ProfileController::class.'@update')->name('profile.update');
+        Route::post('profile/documents', \App\Http\Controllers\Mentor\ProfileController::class.'@storeDocument')->name('profile.documents.store');
+        Route::post('profile/documents/bulk', \App\Http\Controllers\Mentor\ProfileController::class.'@storeDocumentsBulk')->name('profile.documents.bulk');
+    });
+
+// Admin mentor verification detail routes
+Route::middleware(['auth','role:admin'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
+        Route::get('mentor-verifications/{user}', [\App\Http\Controllers\Admin\MentorVerificationController::class, 'show'])->name('mentor_verifications.show');
+        Route::post('mentor-verifications/{user}/approve-all', [\App\Http\Controllers\Admin\MentorVerificationController::class, 'approveUser'])->name('mentor_verifications.approve_user');
+        Route::post('mentor-verifications/{user}/reject-all', [\App\Http\Controllers\Admin\MentorVerificationController::class, 'rejectUser'])->name('mentor_verifications.reject_user');
+    });
+
+// Debug route to test mentor login
+Route::get('/debug-login', function() {
+    $user = \Illuminate\Support\Facades\Auth::user();
+    if (!$user) {
+        return 'No user logged in. Please login first.';
+    }
+    
+    return [
+        'user_id' => $user->id,
+        'name' => $user->name,
+        'email' => $user->email,
+        'role' => $user->role,
+        'mentor_dashboard_url' => route('mentor.dashboard'),
+        'admin_dashboard_url' => route('admin.dashboard'),
+        'home_url' => route('home'),
+        'current_intended_url' => session()->get('url.intended', 'none'),
+    ];
+});

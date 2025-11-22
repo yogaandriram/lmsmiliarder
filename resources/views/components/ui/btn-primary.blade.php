@@ -3,6 +3,7 @@
   'type' => 'button',
   'icon' => null,
   'size' => 'md',
+  'variant' => 'default', // default | danger
 ])
 
 @php
@@ -12,7 +13,9 @@
     'lg' => 'px-5 py-3 text-lg',
   ];
   $base = 'inline-flex items-center gap-2 rounded-lg font-semibold transition backdrop-blur-md shadow-inner';
-  $styles = 'text-black bg-gradient-to-b from-yellow-400 to-amber-500 hover:from-yellow-300 hover:to-amber-400 ring-1 ring-white/20';
+  $styles = $variant === 'danger'
+    ? 'text-white bg-gradient-to-b from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 ring-1 ring-red-400/30'
+    : 'text-black bg-gradient-to-b from-yellow-400 to-amber-500 hover:from-yellow-300 hover:to-amber-400 ring-1 ring-white/20';
   $classes = trim($base.' '.($sizes[$size] ?? $sizes['md']).' '.$styles);
 @endphp
 
