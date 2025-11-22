@@ -9,10 +9,11 @@ class Course extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['author_id','title','slug','description','thumbnail_url','price','status','category_id','verification_status','verified_at','intro_video_url'];
+    protected $fillable = ['author_id','title','slug','description','thumbnail_url','price','mentor_share_percent','status','category_id','verification_status','verified_at','intro_video_url'];
 
     protected $casts = [
         'verified_at' => 'datetime',
+        'mentor_share_percent' => 'integer',
     ];
 
     /**

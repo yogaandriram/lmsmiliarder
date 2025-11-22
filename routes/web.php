@@ -15,10 +15,16 @@ use App\Http\Controllers\Admin\AdminBankAccountController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\SettingsController as AdminSettingsController;
 use App\Http\Controllers\Mentor\DashboardController as MentorDashboardController;
+use App\Http\Controllers\Public\CourseController as PublicCourseController;
 
 Route::get('/', function () {
     return view('home');
 })->name('home');
+
+// Public course preview by slug
+Route::get('/courses/{slug}', [PublicCourseController::class, 'show'])->name('public.courses.show');
+// Public course preview by author + course slug
+Route::get('/courses/{mentor}/{course}', [PublicCourseController::class, 'showByAuthorCourse'])->name('public.courses.show.by_author');
 
 // Auth routes
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -94,6 +100,10 @@ Route::middleware(['auth','role:mentor'])
         
         // Course Management
         Route::resource('courses', \App\Http\Controllers\Mentor\CourseController::class);
+        Route::get('courses/{mentor}/{course}', [\App\Http\Controllers\Mentor\CourseController::class, 'showBySlug'])->name('courses.show.slug');
+        Route::get('courses/{mentor}/{course}/edit', [\App\Http\Controllers\Mentor\CourseController::class, 'editBySlug'])->name('courses.edit.slug');
+        Route::put('courses/{mentor}/{course}', [\App\Http\Controllers\Mentor\CourseController::class, 'updateBySlug'])->name('courses.update.slug');
+        Route::delete('courses/{mentor}/{course}', [\App\Http\Controllers\Mentor\CourseController::class, 'destroyBySlug'])->name('courses.destroy.slug');
         Route::get('courses/{course}/modules/{module}', [\App\Http\Controllers\Mentor\CourseController::class, 'showModule'])->name('courses.modules.show');
         Route::post('courses/{course}/modules/{module}/lessons', [\App\Http\Controllers\Mentor\CourseController::class, 'storeLesson'])->name('courses.modules.lessons.store');
         Route::get('courses/{course}/modules/{module}/lessons/{lesson}', [\App\Http\Controllers\Mentor\CourseController::class, 'showLesson'])->name('courses.modules.lessons.show');

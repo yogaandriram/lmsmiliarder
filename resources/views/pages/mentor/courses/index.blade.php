@@ -77,9 +77,9 @@
                         </td>
                         <td class="text-right py-3 px-4">
                             <div class="flex gap-2 justify-end">
-                                <x-ui.btn-secondary href="{{ route('mentor.courses.show', $course) }}" size="sm" icon="fa-solid fa-eye">Detail</x-ui.btn-secondary>
-                                <x-ui.btn-secondary href="{{ route('mentor.courses.edit', $course) }}" size="sm" icon="fa-solid fa-edit">Edit</x-ui.btn-secondary>
-                                <form method="POST" action="{{ route('mentor.courses.destroy', $course) }}" class="inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus kursus ini?')">
+                                <x-ui.btn-secondary href="{{ route('mentor.courses.show.slug', [\Illuminate\Support\Str::slug($course->author->name), $course->slug]) }}" size="sm" icon="fa-solid fa-eye">Detail</x-ui.btn-secondary>
+                                <x-ui.btn-secondary href="{{ route('mentor.courses.edit.slug', [\Illuminate\Support\Str::slug($course->author->name), $course->slug]) }}" size="sm" icon="fa-solid fa-edit">Edit</x-ui.btn-secondary>
+                                <form method="POST" action="{{ route('mentor.courses.destroy.slug', [\Illuminate\Support\Str::slug($course->author->name), $course->slug]) }}" class="inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus kursus ini?')">
                                     @csrf
                                     @method('DELETE')
                                     <x-ui.btn-secondary type="submit" size="sm" icon="fa-solid fa-trash">Hapus</x-ui.btn-secondary>

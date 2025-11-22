@@ -31,6 +31,7 @@ class ProfileController extends Controller
         $validated = $request->validate([
             'name' => ['required','string','max:255'],
             'bio' => ['nullable','string'],
+            'job_title' => ['nullable','string','max:255'],
             'avatar' => ['nullable','image','mimes:jpg,jpeg,png,webp','max:2048'],
         ]);
 
@@ -42,6 +43,7 @@ class ProfileController extends Controller
         $user->update([
             'name' => $validated['name'],
             'bio' => $validated['bio'] ?? $user->bio,
+            'job_title' => $validated['job_title'] ?? $user->job_title,
             'avatar_url' => $validated['avatar_url'] ?? $user->avatar_url,
         ]);
 

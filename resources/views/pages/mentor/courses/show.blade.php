@@ -14,7 +14,7 @@
         </div>
         <div class="flex gap-3">
             <x-ui.btn-secondary href="{{ route('mentor.courses.index') }}" icon="fa-solid fa-arrow-left">Kembali</x-ui.btn-secondary>
-            <x-ui.btn-primary href="{{ route('mentor.courses.edit', $course) }}" icon="fa-solid fa-edit">Edit Kursus</x-ui.btn-primary>
+            <x-ui.btn-primary href="{{ route('mentor.courses.edit.slug', [\Illuminate\Support\Str::slug($course->author->name), $course->slug]) }}" icon="fa-solid fa-edit">Edit Kursus</x-ui.btn-primary>
         </div>
     </div>
 
@@ -162,6 +162,38 @@
                         <span class="text-white/90">Diperbarui</span>
                         <span class="text-white/70 text-sm">{{ $course->updated_at->diffForHumans() }}</span>
                     </div>
+                </div>
+            </div>
+
+            <!-- Bagi Hasil -->
+            <div class="glass p-6 rounded-lg">
+                <h3 class="text-lg font-semibold text-yellow-400 mb-4">Bagi Hasil</h3>
+                <div class="space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="text-white/90">Untuk Mentor</span>
+                        <span class="text-yellow-300 font-semibold">{{ (int)($course->mentor_share_percent ?? 80) }}%</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-white/90">Untuk Admin</span>
+                        <span class="text-yellow-300 font-semibold">{{ 100 - (int)($course->mentor_share_percent ?? 80) }}%</span>
+                    </div>
+                    <p class="text-white/60 text-xs">Total selalu 100%. Kursus gratis mengabaikan bagi hasil.</p>
+                </div>
+            </div>
+
+            <!-- Slug & Preview -->
+            <div class="glass p-6 rounded-lg">
+                <h3 class="text-lg font-semibold text-yellow-400 mb-4">Slug & Preview</h3>
+                <div class="space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="text-white/90">Slug</span>
+                        <span class="text-white/70 text-sm">{{ $course->slug }}</span>
+                    </div>
+                    <a href="{{ route('public.courses.show.by_author', [\Illuminate\Support\Str::slug($course->author->name), $course->slug]) }}" target="_blank" class="inline-flex items-center gap-2 px-3 py-2 bg-white/10 hover:bg-white/15 rounded">
+                        <i class="fa-solid fa-up-right-from-square"></i>
+                        <span>Preview Halaman Kursus</span>
+                    </a>
+                    <p class="text-white/60 text-xs">Halaman preview menggunakan tampilan publik, bukan dashboard pengguna.</p>
                 </div>
             </div>
         </div>

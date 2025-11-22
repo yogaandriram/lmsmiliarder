@@ -128,6 +128,35 @@
                 @enderror
             </div>
 
+            <!-- Bagi Hasil -->
+            <div class="space-y-4">
+                <h3 class="text-lg font-semibold text-yellow-400 mb-4">Bagi Hasil</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-white/90 mb-2 flex items-center gap-2">
+                            Untuk Mentor (%)
+                            <span class="relative group inline-flex items-center">
+                                <i class="fa-solid fa-circle-info text-white/70"></i>
+                                <span class="absolute left-1/2 -translate-x-1/2 mt-6 hidden group-hover:block whitespace-nowrap text-xs bg-black/80 text-white px-3 py-2 rounded shadow z-50">
+                                    Nilai 0..100. Field Admin menyesuaikan agar total selalu 100.
+                                </span>
+                            </span>
+                        </label>
+                        <input type="number" min="0" max="100" name="mentor_share_percent" id="mentor_share_percent_create"
+                               class="w-full p-2 rounded bg-white/10 border border-white/20 text-white"
+                               value="{{ old('mentor_share_percent', 80) }}" required />
+                        @error('mentor_share_percent')
+                            <p class="text-red-400 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-white/90 mb-2">Untuk Admin (%)</label>
+                        <input type="number" min="0" max="100" id="admin_share_percent_create"
+                               class="w-full p-2 rounded bg-white/10 border border-white/20 text-white" value="{{ 100 - (int)old('mentor_share_percent', 80) }}" readonly />
+                    </div>
+                </div>
+            </div>
+
             <!-- Actions -->
             <div class="flex gap-3 pt-6">
                 <x-ui.btn-primary type="submit" icon="fa-solid fa-save">Simpan Kursus</x-ui.btn-primary>
@@ -140,6 +169,8 @@
 (function(){
   var disp = document.getElementById('price_display_create');
   var hidden = document.getElementById('price_value_create');
+  var mentor = document.getElementById('mentor_share_percent_create');
+  var admin = document.getElementById('admin_share_percent_create');
   if(disp && hidden){
     var format = function(v){
       v = (v||'').toString().replace(/[^0-9]/g,'');
@@ -159,6 +190,12 @@
     });
     // initialize
     disp.value = format(disp.value);
+  }
+  if(mentor && admin){
+    var clamp = function(n){ n = parseInt(n,10); if(isNaN(n)) n = 0; return Math.min(100, Math.max(0, n)); };
+    var sync = function(){ var m = clamp(mentor.value); mentor.value = m; admin.value = 100 - m; };
+    mentor.addEventListener('input', sync);
+    sync();
   }
 })();
 </script>

@@ -249,3 +249,39 @@ Putih: Digunakam untuk teks utama, latar belakang kartu (dengan efek glassmorphi
 Tipografi: Pilihan font harus mendukung keterbacaan yang baik di atas efek glassmorphism, dengan kontras yang cukup dari warna teks (putih atau variasi kuning).
 
 Ikonografi: Seluruh ikon yang digunakan dalam sistem harus bersumber dari library Font Awesome untuk menjaga konsistensi visual.
+
+5.7 Model Bisnis Bagi Hasil Kursus
+
+- Tujuan: Mendukung bagi hasil antara Mentor dan Admin per kursus dalam bentuk persentase.
+- Skema Data:
+  - Tambah kolom di `courses`:
+    - `mentor_share_percent` int [not null, default: 80, range: 0..100]
+    - `verified_at` sudah ada; tidak berubah
+    - `intro_video_url` sudah ada; tidak berubah
+  - `admin_share_percent` tidak disimpan; dihitung saat runtime: `100 - mentor_share_percent`.
+- Aturan & Validasi:
+  - `mentor_share_percent` wajib dalam rentang 0..100 (integer).
+  - Jika `price = 0` (gratis), bagi hasil diabaikan: `mentor_earning = 0`, `admin_commission = 0`.
+  - Nilai Admin selalu komplementer terhadap nilai Mentor dan total selalu 100.
+- Perilaku UI (Mentor):
+  - Di halaman Buat/Edit Kursus ditampilkan dua field:
+    - "Untuk Mentor (%)" (editable)
+    - "Untuk Admin (%)" (read-only atau editable tersinkron)
+  - Saat Mentor mengisi nilai (mis. 70), field Admin otomatis menjadi 30.
+  - Jika Admin diizinkan editable, perubahan salah satu field otomatis menyelaraskan field lain agar total = 100.
+  - Tooltip pada label menjelaskan aturan komplementer dan rentang validasi.
+- Perhitungan (Transaksi Sukses):
+  - `effective_price` per item kursus = harga item setelah kupon/diskon diterapkan dan tidak negatif.
+  - `mentor_earning` = `effective_price * mentor_share_percent / 100`.
+  - `admin_commission` = `effective_price - mentor_earning`.
+  - Dashboard Mentor/Admin menggunakan persentase per-kursus; jika tidak diisi, gunakan default 80%/20%.
+- Dampak Kupon/Discount:
+  - Bagi hasil dihitung dari `effective_price` setelah diskon/kupon pada item (bukan dari harga katalog jika berbeda).
+- Migrasi:
+  - Tambahkan migrasi: `add_mentor_share_percent_to_courses_table` menambah kolom `mentor_share_percent` (int, default 80, not null).
+  - Sesuaikan model `Course` agar kolom baru dapat diisi (fillable) dan di-cast jika diperlukan.
+- API/Server:
+  - Endpoint create/update kursus menerima `mentor_share_percent` dan memvalidasi 0..100.
+  - `admin_share_percent` dihitung di service layer; tidak perlu disimpan (kecuali untuk kebutuhan auditing).
+- Auditing (Opsional):
+  - Sistem dapat menyimpan nilai perhitungan `mentor_earning` dan `admin_commission` per item transaksi untuk pelacakan laporan.

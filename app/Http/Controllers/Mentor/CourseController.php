@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use App\Models\User;
 // removed duplicate Storage import
 
 class CourseController extends Controller
@@ -48,6 +49,7 @@ class CourseController extends Controller
             'description' => 'required|string',
             'category_id' => 'required|exists:categories,id',
             'price' => 'required|numeric|min:0',
+            'mentor_share_percent' => 'required|integer|min:0|max:100',
             'thumbnail' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'status' => 'required|in:draft,published,archived',
             'tags' => 'array',
@@ -62,6 +64,7 @@ class CourseController extends Controller
             'description' => $validated['description'],
             'category_id' => $validated['category_id'],
             'price' => $validated['price'],
+            'mentor_share_percent' => $validated['mentor_share_percent'],
             'status' => $validated['status'],
             'author_id' => Auth::id(),
             'verification_status' => 'pending',
@@ -90,6 +93,13 @@ class CourseController extends Controller
         return view('pages.mentor.courses.show', compact('course'));
     }
 
+    public function showBySlug(string $mentor, string $course)
+    {
+        $user = User::whereRaw('LOWER(REPLACE(name, " ", "-")) = ?', [Str::slug($mentor)])->firstOrFail();
+        $model = Course::where('author_id', $user->id)->where('slug', $course)->firstOrFail();
+        return $this->show($model);
+    }
+
     public function edit(Course $course)
     {
         $this->ensureOwned($course);
@@ -98,6 +108,13 @@ class CourseController extends Controller
         $tags = Tag::where('is_active', true)->get();
 
         return view('pages.mentor.courses.edit', compact('course', 'categories', 'tags'));
+    }
+
+    public function editBySlug(string $mentor, string $course)
+    {
+        $user = User::whereRaw('LOWER(REPLACE(name, " ", "-")) = ?', [Str::slug($mentor)])->firstOrFail();
+        $model = Course::where('author_id', $user->id)->where('slug', $course)->firstOrFail();
+        return $this->edit($model);
     }
 
     public function update(Request $request, Course $course)
@@ -109,6 +126,7 @@ class CourseController extends Controller
             'description' => 'required|string',
             'category_id' => 'required|exists:categories,id',
             'price' => 'required|numeric|min:0',
+            'mentor_share_percent' => 'required|integer|min:0|max:100',
             'thumbnail' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'status' => 'required|in:draft,published,archived',
             'tags' => 'array',
@@ -123,6 +141,7 @@ class CourseController extends Controller
             'description' => $validated['description'],
             'category_id' => $validated['category_id'],
             'price' => $validated['price'],
+            'mentor_share_percent' => $validated['mentor_share_percent'],
             'status' => $validated['status'],
             'intro_video_url' => $validated['intro_video_url'] ?? null,
         ];
@@ -145,6 +164,13 @@ class CourseController extends Controller
         return redirect()->route('mentor.courses.index')->with('success', 'Kursus berhasil diperbarui!');
     }
 
+    public function updateBySlug(Request $request, string $mentor, string $course)
+    {
+        $user = User::whereRaw('LOWER(REPLACE(name, " ", "-")) = ?', [Str::slug($mentor)])->firstOrFail();
+        $model = Course::where('author_id', $user->id)->where('slug', $course)->firstOrFail();
+        return $this->update($request, $model);
+    }
+
     private function makeUniqueSlug(string $title, ?int $ignoreId = null): string
     {
         $base = Str::slug($title);
@@ -163,6 +189,13 @@ class CourseController extends Controller
         $course->delete();
 
         return redirect()->route('mentor.courses.index')->with('success', 'Kursus berhasil dihapus!');
+    }
+
+    public function destroyBySlug(string $mentor, string $course)
+    {
+        $user = User::whereRaw('LOWER(REPLACE(name, " ", "-")) = ?', [Str::slug($mentor)])->firstOrFail();
+        $model = Course::where('author_id', $user->id)->where('slug', $course)->firstOrFail();
+        return $this->destroy($model);
     }
 
     public function storeModule(Request $request, Course $course)

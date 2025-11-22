@@ -19,6 +19,7 @@
         @csrf
         <x-ui.crud.input label="Nama" name="name" :value="$user->name" required variant="glass" />
         <x-ui.crud.input label="Email" name="email" :value="$user->email" variant="glass" disabled />
+        <x-ui.crud.input label="Pekerjaan" name="job_title" :value="old('job_title', $user->job_title)" variant="glass" placeholder="mis. Digital Marketing Expert" />
         <x-ui.crud.textarea label="Bio" name="bio" variant="glass">{{ old('bio', $user->bio) }}</x-ui.crud.textarea>
 
         <div class="space-y-2">
