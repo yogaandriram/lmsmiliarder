@@ -14,7 +14,7 @@
 
     <!-- Form -->
     <div class="glass p-6 rounded-lg">
-        <form method="POST" action="{{ route('mentor.ebooks.store') }}" class="space-y-6">
+        <form method="POST" action="{{ route('mentor.ebooks.store') }}" class="space-y-6" enctype="multipart/form-data">
             @csrf
 
             <!-- Basic Information -->
@@ -62,14 +62,12 @@
                 </div>
 
                 <div>
-                    <label for="file_url" class="block text-sm font-medium text-white/90 mb-2">URL File E-book *</label>
-                    <input type="url" name="file_url" id="file_url" value="{{ old('file_url') }}" required
-                           class="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg focus:ring-2 focus:ring-yellow-400 focus:border-transparent text-white placeholder-white/50"
-                           placeholder="https://example.com/ebook.pdf">
-                    @error('file_url')
+                    <label for="file" class="block text-sm font-medium text-white/90 mb-2">Upload File E-book *</label>
+                    <x-ui.crud.input name="file" id="file" type="file" required variant="glass" />
+                    @error('file')
                         <p class="text-red-400 text-sm mt-1">{{ $message }}</p>
                     @enderror
-                    <p class="text-white/60 text-sm mt-1">Masukkan URL file e-book (PDF, EPUB, dll.)</p>
+                    <p class="text-white/60 text-sm mt-1">Unggah file e-book (PDF, EPUB, dll.).</p>
                 </div>
             </div>
 

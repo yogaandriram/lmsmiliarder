@@ -7,6 +7,7 @@ use App\Models\Ebook;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 class EbookController extends Controller
 {
@@ -30,20 +31,30 @@ class EbookController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'cover_image_url' => 'nullable|url',
-            'file_url' => 'required|url',
+            'file' => 'required|file|mimes:pdf,epub,txt|max:20480',
             'price' => 'required|numeric|min:0',
             'status' => 'required|in:draft,published,archived',
         ]);
 
+        $slug = Str::slug($validated['title']);
+        $authorId = Auth::id();
+        $storedUrl = null;
+        if ($request->hasFile('file')) {
+            $original = $request->file('file')->getClientOriginalName();
+            $safeName = now()->format('YmdHis').'_'.Str::slug(pathinfo($original, PATHINFO_FILENAME)).'.'.strtolower($request->file('file')->getClientOriginalExtension());
+            $path = $request->file('file')->storeAs('ebooks/'.$authorId.'/'.$slug, $safeName, 'public');
+            $storedUrl = Storage::url($path);
+        }
+
         $ebook = Ebook::create([
             'title' => $validated['title'],
-            'slug' => Str::slug($validated['title']),
+            'slug' => $slug,
             'description' => $validated['description'],
             'cover_image_url' => $validated['cover_image_url'],
-            'file_url' => $validated['file_url'],
+            'file_url' => $storedUrl,
             'price' => $validated['price'],
             'status' => $validated['status'],
-            'author_id' => Auth::id(),
+            'author_id' => $authorId,
         ]);
 
         return redirect()->route('mentor.ebooks.index')->with('success', 'E-book berhasil dibuat!');
