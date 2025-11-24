@@ -63,7 +63,7 @@
                     <div class="text-xs text-white/60">Geser halaman seperti buku, lengkap dengan suara</div>
                 </div>
                 <div id="ebook_preview_wrapper" class="relative w-full">
-                    <div id="ebook_flipbook" class="w-full h-[70vh] bg-black/30 rounded overflow-hidden"></div>
+                    <div id="ebook_flipbook" data-file-url="{{ $ebook->file_url }}" class="w-full h-[70vh] bg-black/30 rounded overflow-hidden"></div>
                 </div>
                 <div id="ebook_preview_note" class="mt-3 text-white/60 text-sm hidden"></div>
             </div>
@@ -114,14 +114,16 @@
             <div class="glass p-6 rounded-lg">
                 <h3 class="text-lg font-semibold text-yellow-400 mb-4">Pengaturan E-book</h3>
                 <div class="space-y-3">
+                    @php
+                      $statusClass = $ebook->status === 'published'
+                        ? 'bg-green-500/20 text-green-300'
+                        : ($ebook->status === 'draft'
+                          ? 'bg-gray-500/20 text-gray-300'
+                          : 'bg-orange-500/20 text-orange-300');
+                    @endphp
                     <div class="flex items-center justify-between">
                         <span class="text-white/90">Status</span>
-                        <span class="px-2 py-1 text-xs rounded-full 
-                            @if($ebook->status == 'published') bg-green-500/20 text-green-300
-                            @elseif($ebook->status == 'draft') bg-gray-500/20 text-gray-300
-                            @else bg-orange-500/20 text-orange-300 @endif">
-                            {{ ucfirst($ebook->status) }}
-                        </span>
+                        <span class="px-2 py-1 text-xs rounded-full {{ $statusClass }}">{{ ucfirst($ebook->status) }}</span>
                     </div>
                     <div class="flex items-center justify-between">
                         <span class="text-white/90">Dibuat</span>
@@ -138,8 +140,8 @@
 </div>
 <script>
 (function(){
-  var fileUrl = @json($ebook->file_url);
   var flipEl = document.getElementById('ebook_flipbook');
+  var fileUrl = flipEl ? flipEl.getAttribute('data-file-url') : '';
   var noteEl = document.getElementById('ebook_preview_note');
   function isPdf(url){ return /\.pdf($|\?)/i.test(url || ''); }
   function playPaperSound(){ try{
