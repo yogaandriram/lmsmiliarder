@@ -22,7 +22,7 @@
 
     <x-ui.sidebar.section title="Kelola Konten">
       <x-ui.sidebar.item href="{{ route('mentor.courses.index') }}" icon="fa-solid fa-chalkboard-teacher" label="Kursus Saya" :active="$isCourses" />
-      <x-ui.sidebar.item href="#" icon="fa-solid fa-book-open" label="E-book Saya" :active="$isEbooks" />
+      <x-ui.sidebar.item href="{{ route('mentor.ebooks.index') }}" icon="fa-solid fa-book-open" label="E-book Saya" :active="$isEbooks" />
       <x-ui.sidebar.item href="#" icon="fa-solid fa-question-circle" label="Kuis Saya" :active="$isQuizzes" />
     </x-ui.sidebar.section>
 
