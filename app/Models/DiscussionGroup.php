@@ -9,6 +9,9 @@ class DiscussionGroup extends Model
 {
     use HasFactory;
 
+    protected $table = 'discussion_groups';
+    public $timestamps = false;
+
     protected $fillable = [
         'course_id',
         'group_name'

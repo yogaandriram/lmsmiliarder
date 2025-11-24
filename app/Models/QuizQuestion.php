@@ -9,19 +9,18 @@ class QuizQuestion extends Model
 {
     use HasFactory;
 
+    protected $table = 'quiz_questions';
+
     protected $fillable = [
         'quiz_id',
         'question_text',
         'question_type',
-        'options',
-        'correct_answer',
-        'points'
+        'question_order',
     ];
 
-    protected $casts = [
-        'options' => 'array',
-        'points' => 'integer'
-    ];
+    protected $casts = [];
+
+    public $timestamps = false;
 
     /**
      * Get the quiz that this question belongs to.
@@ -29,5 +28,10 @@ class QuizQuestion extends Model
     public function quiz()
     {
         return $this->belongsTo(Quiz::class);
+    }
+
+    public function options()
+    {
+        return $this->hasMany(QuizOption::class, 'question_id');
     }
 }

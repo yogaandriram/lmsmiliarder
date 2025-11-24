@@ -110,6 +110,9 @@ Route::middleware(['auth','role:mentor'])
         Route::put('courses/{course}/modules/{module}/lessons/{lesson}', [\App\Http\Controllers\Mentor\CourseController::class, 'updateLesson'])->name('courses.modules.lessons.update');
         Route::delete('courses/{course}/modules/{module}/lessons/{lesson}', [\App\Http\Controllers\Mentor\CourseController::class, 'destroyLesson'])->name('courses.modules.lessons.destroy');
         Route::post('courses/{course}/modules', [\App\Http\Controllers\Mentor\CourseController::class, 'storeModule'])->name('courses.modules.store');
+        // Quiz per modul: hanya satu
+        Route::post('courses/{course}/modules/{module}/quiz', [\App\Http\Controllers\Mentor\QuizController::class, 'storeForModule'])->name('courses.modules.quiz.store');
+        Route::post('courses/{course}/modules/{module}/quiz/questions', [\App\Http\Controllers\Mentor\QuizQuestionController::class, 'store'])->name('courses.modules.quiz.questions.store');
         
         // Ebook Management
         Route::resource('ebooks', \App\Http\Controllers\Mentor\EbookController::class);
@@ -121,6 +124,12 @@ Route::middleware(['auth','role:mentor'])
         Route::post('profile', \App\Http\Controllers\Mentor\ProfileController::class.'@update')->name('profile.update');
         Route::post('profile/documents', \App\Http\Controllers\Mentor\ProfileController::class.'@storeDocument')->name('profile.documents.store');
         Route::post('profile/documents/bulk', \App\Http\Controllers\Mentor\ProfileController::class.'@storeDocumentsBulk')->name('profile.documents.bulk');
+
+        // Discussions
+        Route::get('discussions', [\App\Http\Controllers\Mentor\DiscussionController::class, 'index'])->name('discussions.index');
+        Route::get('discussions/{group}/chat', [\App\Http\Controllers\Mentor\DiscussionController::class, 'chat'])->name('discussions.chat');
+        Route::post('discussions/{group}/chat', [\App\Http\Controllers\Mentor\DiscussionController::class, 'postMessage'])->name('discussions.chat.post');
+        Route::get('discussions/{group}/messages', [\App\Http\Controllers\Mentor\DiscussionController::class, 'fetchMessages'])->name('discussions.chat.fetch');
     });
 
 // Admin mentor verification detail routes

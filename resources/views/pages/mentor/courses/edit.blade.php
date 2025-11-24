@@ -24,6 +24,8 @@
                 
                 <x-ui.crud.input label="Judul Kursus *" name="title" :value="old('title', $course->title)" required variant="glass" />
 
+                <x-ui.crud.input label="Slug Kursus" name="slug" id="slug_edit_input" :value="old('slug', $course->slug)" variant="glass" placeholder="contoh: nama-kursus" />
+
                 <x-ui.crud.textarea label="Deskripsi *" name="description" variant="glass">{{ old('description', $course->description) }}</x-ui.crud.textarea>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -42,7 +44,7 @@
                         @enderror
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-white/90 mb-2 flex items-center gap-2">
+                        <label class="text-sm font-medium text-white/90 mb-2 flex items-center gap-2">
                             Harga (Rp) *
                             <span class="relative group inline-flex items-center">
                                 <i class="fa-solid fa-circle-info text-white/70"></i>
@@ -137,7 +139,7 @@
                 <h3 class="text-lg font-semibold text-yellow-400 mb-4">Bagi Hasil</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-medium text-white/90 mb-2 flex items-center gap-2">
+                        <label class="text-sm font-medium text-white/90 mb-2 flex items-center gap-2">
                             Untuk Mentor (%)
                             <span class="relative group inline-flex items-center">
                                 <i class="fa-solid fa-circle-info text-white/70"></i>
@@ -154,11 +156,21 @@
                         @enderror
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-white/90 mb-2">Untuk Admin (%)</label>
+                        <label class="text-sm font-medium text-white/90 mb-2">Untuk Admin (%)</label>
                         <input type="number" min="0" max="100" id="admin_share_percent_edit"
                                class="w-full p-2 rounded bg-white/10 border border-white/20 text-white" value="{{ 100 - (int)old('mentor_share_percent', (int)($course->mentor_share_percent ?? 80)) }}" readonly />
                     </div>
                 </div>
+            </div>
+
+            <!-- Diskusi Kursus -->
+            <div class="space-y-4">
+                <h3 class="text-lg font-semibold text-yellow-400 mb-4">Diskusi Kursus</h3>
+                <label class="flex items-center gap-3 p-3 bg-white/5 rounded">
+                    <input type="checkbox" name="enable_discussion" value="1" class="w-5 h-5 rounded border-white/30 bg-white/10" {{ $course->discussionGroup ? 'checked' : '' }}>
+                    <span class="text-white/90">Aktifkan grup diskusi untuk kursus ini</span>
+                </label>
+                <p class="text-sm text-white/60">Satu kursus memiliki satu grup diskusi yang berisi mentor, admin, dan semua siswa terdaftar.</p>
             </div>
 
             <!-- Actions -->
@@ -198,6 +210,11 @@
     var sync = function(){ var m = clamp(mentor.value); mentor.value = m; admin.value = 100 - m; };
     mentor.addEventListener('input', sync);
     sync();
+  }
+  var slugInput = document.getElementById('slug_edit_input');
+  if(slugInput){
+    var slugify = function(v){ v = (v||'').toString().toLowerCase(); v = v.replace(/[^a-z0-9\s-]/g,''); v = v.trim().replace(/\s+/g,'-').replace(/-+/g,'-'); return v; };
+    slugInput.addEventListener('input', function(){ slugInput.value = slugify(slugInput.value); });
   }
 })();
 </script>

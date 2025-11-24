@@ -27,7 +27,7 @@
     </x-ui.sidebar.section>
 
     <x-ui.sidebar.section title="Interaksi">
-      <x-ui.sidebar.item href="#" icon="fa-solid fa-comments" label="Diskusi" :active="$isDiscussions" />
+      <x-ui.sidebar.item href="{{ route('mentor.discussions.index') }}" icon="fa-solid fa-comments" label="Diskusi" :active="$isDiscussions" />
     </x-ui.sidebar.section>
 
     <x-ui.sidebar.section title="Laporan">

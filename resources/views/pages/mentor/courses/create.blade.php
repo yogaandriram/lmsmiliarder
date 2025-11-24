@@ -41,7 +41,7 @@
                         @enderror
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-white/90 mb-2 flex items-center gap-2">
+                        <label class="text-sm font-medium text-white/90 mb-2 flex items-center gap-2">
                             Harga (Rp) *
                             <span class="relative group inline-flex items-center">
                                 <i class="fa-solid fa-circle-info text-white/70"></i>
@@ -133,7 +133,7 @@
                 <h3 class="text-lg font-semibold text-yellow-400 mb-4">Bagi Hasil</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-medium text-white/90 mb-2 flex items-center gap-2">
+                        <label class="text-sm font-medium text-white/90 mb-2 flex items-center gap-2">
                             Untuk Mentor (%)
                             <span class="relative group inline-flex items-center">
                                 <i class="fa-solid fa-circle-info text-white/70"></i>
@@ -150,11 +150,21 @@
                         @enderror
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-white/90 mb-2">Untuk Admin (%)</label>
+                        <label class="text-sm font-medium text-white/90 mb-2">Untuk Admin (%)</label>
                         <input type="number" min="0" max="100" id="admin_share_percent_create"
                                class="w-full p-2 rounded bg-white/10 border border-white/20 text-white" value="{{ 100 - (int)old('mentor_share_percent', 80) }}" readonly />
                     </div>
                 </div>
+            </div>
+
+            <!-- Diskusi Kursus -->
+            <div class="space-y-4">
+                <h3 class="text-lg font-semibold text-yellow-400 mb-4">Diskusi Kursus</h3>
+                <label class="flex items-center gap-3 p-3 bg-white/5 rounded">
+                    <input type="checkbox" name="enable_discussion" value="1" class="w-5 h-5 rounded border-white/30 bg-white/10">
+                    <span class="text-white/90">Aktifkan grup diskusi untuk kursus ini</span>
+                </label>
+                <p class="text-sm text-white/60">Satu kursus memiliki satu grup diskusi yang berisi mentor, admin, dan semua siswa terdaftar.</p>
             </div>
 
             <!-- Actions -->

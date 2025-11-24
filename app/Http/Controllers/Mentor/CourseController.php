@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use App\Models\User;
+use App\Models\DiscussionGroup;
 // removed duplicate Storage import
 
 class CourseController extends Controller
@@ -55,6 +56,7 @@ class CourseController extends Controller
             'tags' => 'array',
             'tags.*' => 'exists:tags,id',
             'intro_video_url' => 'nullable|url',
+            'enable_discussion' => 'nullable',
         ]);
 
         $slug = $this->makeUniqueSlug($validated['title']);
@@ -79,6 +81,13 @@ class CourseController extends Controller
         if (isset($validated['tags'])) {
             $course->tags()->attach($validated['tags']);
         }
+        if ($request->boolean('enable_discussion')) {
+            DiscussionGroup::firstOrCreate([
+                'course_id' => $course->id,
+            ], [
+                'group_name' => $course->title,
+            ]);
+        }
 
         return redirect()->route('mentor.courses.index')->with('success', 'Kursus berhasil dibuat!');
     }
@@ -89,6 +98,7 @@ class CourseController extends Controller
 
         $course->load(['category', 'tags', 'modules.lessons'])
             ->loadCount('enrollments');
+        $course->load('modules.quiz');
 
         return view('pages.mentor.courses.show', compact('course'));
     }
@@ -132,9 +142,13 @@ class CourseController extends Controller
             'tags' => 'array',
             'tags.*' => 'exists:tags,id',
             'intro_video_url' => 'nullable|url',
+            'enable_discussion' => 'nullable',
+            'slug' => 'nullable|string|max:255',
         ]);
 
-        $newSlug = $this->makeUniqueSlug($validated['title'], $course->id);
+        $newSlug = isset($validated['slug']) && trim($validated['slug']) !== ''
+            ? $this->makeUniqueSlug($validated['slug'], $course->id)
+            : $course->slug;
         $data = [
             'title' => $validated['title'],
             'slug' => $newSlug,
@@ -154,6 +168,14 @@ class CourseController extends Controller
             $data['thumbnail_url'] = Storage::url($path);
         }
         $course->update($data);
+
+        if ($request->boolean('enable_discussion')) {
+            DiscussionGroup::firstOrCreate([
+                'course_id' => $course->id,
+            ], [
+                'group_name' => $course->title,
+            ]);
+        }
 
         if (isset($validated['tags'])) {
             $course->tags()->sync($validated['tags']);
@@ -217,7 +239,7 @@ class CourseController extends Controller
     {
         $this->ensureOwned($course);
         if ($module->course_id !== $course->id) abort(404);
-        $module->load('lessons');
+        $module->load(['lessons','quiz.questions.options']);
         return view('pages.mentor.modules.show', compact('course','module'));
     }
 
