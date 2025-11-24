@@ -57,6 +57,17 @@
                 </div>
             </div>
 
+            <div class="glass p-6 rounded-lg">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold text-yellow-400">Preview E-book</h3>
+                    <div class="text-xs text-white/60">Geser halaman seperti buku, lengkap dengan suara</div>
+                </div>
+                <div id="ebook_preview_wrapper" class="relative w-full">
+                    <div id="ebook_flipbook" class="w-full h-[70vh] bg-black/30 rounded overflow-hidden"></div>
+                </div>
+                <div id="ebook_preview_note" class="mt-3 text-white/60 text-sm hidden"></div>
+            </div>
+
             <!-- File Information -->
             <div class="glass p-6 rounded-lg">
                 <h3 class="text-lg font-semibold text-yellow-400 mb-4">Informasi File</h3>
@@ -125,4 +136,53 @@
         </div>
     </div>
 </div>
+<script>
+(function(){
+  var fileUrl = @json($ebook->file_url);
+  var flipEl = document.getElementById('ebook_flipbook');
+  var noteEl = document.getElementById('ebook_preview_note');
+  function isPdf(url){ return /\.pdf($|\?)/i.test(url || ''); }
+  function playPaperSound(){ try{
+    var ctx = new (window.AudioContext || window.webkitAudioContext)();
+    var duration = 0.25;
+    var buffer = ctx.createBuffer(1, ctx.sampleRate * duration, ctx.sampleRate);
+    var data = buffer.getChannelData(0);
+    for(var i=0;i<data.length;i++){ data[i] = (Math.random()*2-1) * (1 - i/data.length) * 0.2; }
+    var source = ctx.createBufferSource();
+    source.buffer = buffer;
+    var filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass'; filter.frequency.value = 1200;
+    source.connect(filter); filter.connect(ctx.destination);
+    source.start();
+  }catch(e){}
+  }
+
+  if(!isPdf(fileUrl)){
+    if(noteEl){ noteEl.classList.remove('hidden'); noteEl.textContent = 'Preview tersedia untuk file PDF. Saat ini URL file bukan PDF.'; }
+    return;
+  }
+
+  var pdfjsSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js';
+  var pdfWorkerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
+  var pageFlipCss = document.createElement('link'); pageFlipCss.rel='stylesheet'; pageFlipCss.href='https://cdn.jsdelivr.net/npm/st-pageflip@1.2.6/dist/css/st-pageflip.min.css'; document.head.appendChild(pageFlipCss);
+  var pageFlipSrc = 'https://cdn.jsdelivr.net/npm/st-pageflip@1.2.6/dist/js/page-flip.min.js';
+  function loadScript(src){ return new Promise(function(resolve){ var s=document.createElement('script'); s.src=src; s.onload=resolve; document.head.appendChild(s); }); }
+  Promise.resolve()
+    .then(function(){ return loadScript(pdfjsSrc); })
+    .then(function(){ window['pdfjsLib'].GlobalWorkerOptions.workerSrc = pdfWorkerSrc; return loadScript(pageFlipSrc); })
+    .then(function(){ return window['pdfjsLib'].getDocument(fileUrl).promise; })
+    .then(function(pdf){ var images = []; var tasks=[]; var maxPages = Math.min(pdf.numPages, 30);
+      for(var p=1;p<=maxPages;p++){
+        tasks.push(pdf.getPage(p).then(function(page){ var viewport = page.getViewport({ scale: 1.5 }); var canvas = document.createElement('canvas'); var ctx = canvas.getContext('2d'); canvas.width = viewport.width; canvas.height = viewport.height; return page.render({ canvasContext: ctx, viewport: viewport }).promise.then(function(){ images.push(canvas.toDataURL('image/jpeg', 0.9)); }); }));
+      }
+      return Promise.all(tasks).then(function(){ images.sort(); return images; });
+    })
+    .then(function(images){
+      var pf = new window['St'].PageFlip(flipEl, { width: 800, height: 1100, size: 'stretch', maxShadowOpacity: 0.5, usePortrait: true, showCover: true, mobileScrollSupport: true, flippingTime: 700 });
+      pf.loadFromImages(images);
+      pf.on('flip', function(){ playPaperSound(); });
+    })
+    .catch(function(err){ if(noteEl){ noteEl.classList.remove('hidden'); noteEl.textContent = 'Gagal memuat preview: '+(err && err.message ? err.message : err); } });
+})();
+</script>
 @endsection

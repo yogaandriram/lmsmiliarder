@@ -10,6 +10,8 @@ class SettingsController extends Controller
     {
         $members = \App\Models\User::orderBy('name')->get();
         $accounts = \App\Models\AdminBankAccount::orderBy('bank_name')->get();
-        return view('pages.admin.settings.index', compact('members','accounts'));
+        $coupons = \App\Models\Coupon::orderByDesc('expires_at')->get();
+        $tab = request('tab', 'accounts');
+        return view('pages.admin.settings.index', compact('members','accounts','coupons','tab'));
     }
 }

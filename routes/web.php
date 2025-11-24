@@ -84,6 +84,9 @@ Route::middleware(['auth','admin'])
         // Rekening bank admin
         Route::resource('admin-bank-accounts', AdminBankAccountController::class)->only(['store','update','destroy']);
 
+        // Kupon Diskon
+        Route::resource('coupons', \App\Http\Controllers\Admin\CouponController::class)->only(['store','update','destroy']);
+
         // Kelola User
         Route::resource('users', AdminUserController::class)->only(['index','create','store','show','edit','update','destroy']);
 
