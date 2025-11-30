@@ -16,9 +16,9 @@
             <!-- Kanan: Notification, Pengaturan, Profile, Logout -->
             <div class="flex items-center gap-3">
                 @php $isAdmin = request()->routeIs('admin.*'); @endphp
-                <x-ui.navbar.admin.button icon="fa-regular fa-bell" variant="glass" href="{{ $isAdmin ? route('admin.announcements.index') : route('mentor.notifications') }}" />
-                <x-ui.navbar.admin.button icon="fa-solid fa-gear" variant="glass" href="{{ $isAdmin ? route('admin.settings.index') : route('mentor.settings') }}" />
-                <x-ui.navbar.admin.button icon="fa-solid fa-user" variant="glass" href="{{ $isAdmin ? '#' : route('mentor.profile') }}" />
+                <x-ui.navbar.button icon="fa-regular fa-bell" variant="glass" href="{{ $isAdmin ? route('admin.announcements.index') : route('mentor.notifications') }}" />
+                <x-ui.navbar.button icon="fa-solid fa-gear" variant="glass" href="{{ $isAdmin ? route('admin.settings.index') : route('mentor.settings') }}" />
+                <x-ui.navbar.button icon="fa-solid fa-user" variant="glass" href="{{ $isAdmin ? '#' : route('mentor.profile') }}" />
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
                     <button type="submit" class="h-10 w-10 flex items-center justify-center rounded-xl glass glass-hover ring-1 ring-yellow-300/25" title="Logout">

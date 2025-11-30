@@ -8,8 +8,10 @@
   $isCategories = request()->routeIs('admin.categories.*');
   $isTags = request()->routeIs('admin.tags.*');
   $isUsers = request()->routeIs('admin.users.*');
+  $isMentors = request()->routeIs('admin.mentors.*');
   $isMentorVerify = request()->routeIs('admin.mentor_verifications.*');
   $isCourseVerify = request()->routeIs('admin.course_verifications.*');
+  $isEbookVerify = request()->routeIs('admin.ebook_verifications.*');
   $isTransactions = request()->routeIs('admin.transactions.*');
 @endphp
 
@@ -29,12 +31,12 @@
 
     <x-ui.sidebar.section title="Content Verification">
       <x-ui.sidebar.item href="{{ route('admin.course_verifications.index') }}" icon="fa-solid fa-book-open" label="Kursus" :active="$isCourseVerify" />
-      <x-ui.sidebar.item href="#" icon="fa-solid fa-book" label="E-Book" />
+      <x-ui.sidebar.item href="{{ route('admin.ebook_verifications.index') }}" icon="fa-solid fa-book" label="E-Book" :active="$isEbookVerify" />
     </x-ui.sidebar.section>
 
     <x-ui.sidebar.section title="Manage Account">
       <x-ui.sidebar.item href="{{ route('admin.users.index') }}" icon="fa-solid fa-user-group" label="Kelola User" :active="$isUsers" />
-      <x-ui.sidebar.item href="#" icon="fa-solid fa-user-tie" label="Kelola Mentor" />
+      <x-ui.sidebar.item href="{{ route('admin.mentors.index') }}" icon="fa-solid fa-user-tie" label="Kelola Mentor" :active="$isMentors" />
       <x-ui.sidebar.item href="{{ route('admin.mentor_verifications.index') }}" icon="fa-solid fa-user-check" label="Verifikasi Mentor" :active="$isMentorVerify" />
     </x-ui.sidebar.section>
 

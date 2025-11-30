@@ -15,6 +15,8 @@
   $baseDefault = 'w-full py-2 '.($hasIcon ? 'pl-8' : 'pl-3').' rounded-lg border bg-white text-gray-900 placeholder-gray-400 border-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-500 dark:bg-neutral-900 dark:text-gray-100 dark:placeholder-gray-500 dark:border-white/10 dark:focus:ring-yellow-400';
   $baseGlass = 'w-full p-2 '.($hasIcon ? 'pl-8' : 'pl-2').' rounded bg-white/10 border border-white/20';
   $baseClass = $variant === 'glass' ? $baseGlass : $baseDefault;
+  $fileTweaks = ($type === 'file') ? ' file:mr-0 file:px-0 file:py-0 file:border-0 file:bg-transparent file:text-transparent file:w-0 file:h-0 cursor-pointer' : '';
+  $baseClass = trim($baseClass.$fileTweaks);
 @endphp
 
 @if($label)

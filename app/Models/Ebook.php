@@ -10,7 +10,7 @@ class Ebook extends Model
     use HasFactory;
 
     protected $fillable = [
-        'author_id','title','slug','description','cover_image_url','file_url','price','status'
+        'author_id','title','slug','description','cover_image_url','file_url','price','status','verification_status','verified_at'
     ];
 
     /**

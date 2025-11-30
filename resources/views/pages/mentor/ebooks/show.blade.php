@@ -62,10 +62,27 @@
                     <h3 class="text-lg font-semibold text-yellow-400">Preview E-book</h3>
                     <div class="text-xs text-white/60">Geser halaman seperti buku, lengkap dengan suara</div>
                 </div>
-                <div id="ebook_preview_wrapper" class="relative w-full">
-                    <div id="ebook_flipbook" data-file-url="{{ $ebook->file_url }}" class="w-full h-[70vh] bg-black/30 rounded overflow-hidden"></div>
+                <div id="ebook_preview_wrapper" class="relative w-full overflow-hidden">
+                    <div id="ebook_flipbook" data-file-url="{{ $ebook->file_url }}" class="w-full h-[70vh] bg-transparent rounded overflow-hidden"></div>
+                    <div id="ebook_cover_overlay" class="absolute inset-0 grid place-items-center bg-transparent z-10 hidden" style="pointer-events:none">
+                        <img id="ebook_cover_image" data-cover-url="{{ $ebook->cover_image_url }}" src="" alt="Cover" class="max-h-[68vh] rounded shadow-xl" />
+                    </div>
                 </div>
+                <style>
+                  #ebook_flipbook img{ image-rendering: -webkit-optimize-contrast; image-rendering: crisp-edges; }
+                </style>
                 <div id="ebook_preview_note" class="mt-3 text-white/60 text-sm hidden"></div>
+                <div class="mt-3 flex items-center gap-3">
+                    <x-ui.btn-secondary id="ebook_prev" icon="fa-solid fa-chevron-left">Prev</x-ui.btn-secondary>
+                    <span id="ebook_page_info" class="text-sm text-white/70">...</span>
+                    <x-ui.btn-secondary id="ebook_next" icon="fa-solid fa-chevron-right">Next</x-ui.btn-secondary>
+                    <div class="ml-4 flex items-center gap-2">
+                        <x-ui.btn-secondary id="ebook_zoom_out" icon="fa-solid fa-magnifying-glass-minus"/>
+                        <span id="ebook_zoom_info" class="text-xs text-white/60">100%</span>
+                        <x-ui.btn-secondary id="ebook_zoom_in" icon="fa-solid fa-magnifying-glass-plus"/>
+                        <x-ui.btn-secondary id="ebook_sound" icon="fa-solid fa-volume-high"/>
+                    </div>
+                </div>
             </div>
 
             <!-- File Information -->
@@ -104,9 +121,7 @@
             <div class="glass p-6 rounded-lg">
                 <h3 class="text-lg font-semibold text-yellow-400 mb-4">Aksi Cepat</h3>
                 <div class="space-y-3">
-                    <x-ui.btn-secondary href="{{ $ebook->file_url }}" target="_blank" icon="fa-solid fa-download" class="w-full">Download File</x-ui.btn-secondary>
                     <x-ui.btn-secondary href="#" icon="fa-solid fa-chart-line" class="w-full">Lihat Analitik</x-ui.btn-secondary>
-                    <x-ui.btn-secondary href="#" icon="fa-solid fa-share" class="w-full">Bagikan Link</x-ui.btn-secondary>
                 </div>
             </div>
 
@@ -166,23 +181,51 @@
 
   var pdfjsSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js';
   var pdfWorkerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
-  var pageFlipCss = document.createElement('link'); pageFlipCss.rel='stylesheet'; pageFlipCss.href='https://cdn.jsdelivr.net/npm/st-pageflip@1.2.6/dist/css/st-pageflip.min.css'; document.head.appendChild(pageFlipCss);
-  var pageFlipSrc = 'https://cdn.jsdelivr.net/npm/st-pageflip@1.2.6/dist/js/page-flip.min.js';
+  var pageFlipCss = document.createElement('link'); pageFlipCss.rel='stylesheet'; pageFlipCss.href='https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/css/page-flip.min.css'; document.head.appendChild(pageFlipCss);
+  var pageFlipSrc = 'https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.min.js';
   function loadScript(src){ return new Promise(function(resolve){ var s=document.createElement('script'); s.src=src; s.onload=resolve; document.head.appendChild(s); }); }
   Promise.resolve()
     .then(function(){ return loadScript(pdfjsSrc); })
     .then(function(){ window['pdfjsLib'].GlobalWorkerOptions.workerSrc = pdfWorkerSrc; return loadScript(pageFlipSrc); })
-    .then(function(){ return window['pdfjsLib'].getDocument(fileUrl).promise; })
+    .then(function(){ return window['pdfjsLib'].getDocument({ url: fileUrl }).promise; })
+    .catch(function(){ return fetch(fileUrl, { mode: 'cors' }).then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.arrayBuffer(); }).then(function(ab){ return window['pdfjsLib'].getDocument({ data: ab }).promise; }); })
     .then(function(pdf){ var images = []; var tasks=[]; var maxPages = Math.min(pdf.numPages, 30);
-      for(var p=1;p<=maxPages;p++){
-        tasks.push(pdf.getPage(p).then(function(page){ var viewport = page.getViewport({ scale: 1.5 }); var canvas = document.createElement('canvas'); var ctx = canvas.getContext('2d'); canvas.width = viewport.width; canvas.height = viewport.height; return page.render({ canvasContext: ctx, viewport: viewport }).promise.then(function(){ images.push(canvas.toDataURL('image/jpeg', 0.9)); }); }));
+      for(let p=1; p<=maxPages; p++){
+        const pageNum = p;
+        tasks.push(pdf.getPage(pageNum).then(function(page){
+          var base = page.getViewport({ scale: 1 });
+          var targetW = 800 * (window.devicePixelRatio || 1);
+          var scale = Math.min(4, targetW / base.width);
+          var viewport = page.getViewport({ scale: scale });
+          var canvas = document.createElement('canvas');
+          var ctx = canvas.getContext('2d');
+          canvas.width = Math.floor(viewport.width);
+          canvas.height = Math.floor(viewport.height);
+          if(ctx){ ctx.imageSmoothingEnabled = false; ctx.imageSmoothingQuality = 'high'; }
+          return page.render({ canvasContext: ctx, viewport: viewport }).promise.then(function(){ images[pageNum-1] = canvas.toDataURL('image/png'); });
+        }));
       }
-      return Promise.all(tasks).then(function(){ images.sort(); return images; });
+      return Promise.all(tasks).then(function(){ return images.filter(Boolean); });
     })
     .then(function(images){
-      var pf = new window['St'].PageFlip(flipEl, { width: 800, height: 1100, size: 'stretch', maxShadowOpacity: 0.5, usePortrait: true, showCover: true, mobileScrollSupport: true, flippingTime: 700 });
+      var imagesCache = images.slice();
+      var pf = new window['St'].PageFlip(flipEl, { width: 800, height: 1100, size: 'stretch', maxShadowOpacity: 0.5, usePortrait: false, showCover: true, mobileScrollSupport: false, flippingTime: 700 });
       pf.loadFromImages(images);
-      pf.on('flip', function(){ playPaperSound(); });
+      var currentZoom = 1.0; var isSoundEnabled = true; var zoomInfo = document.getElementById('ebook_zoom_info'); var pageInfo = document.getElementById('ebook_page_info'); var wrapper = document.getElementById('ebook_preview_wrapper');
+      var coverOverlay = document.getElementById('ebook_cover_overlay'); var coverImg = document.getElementById('ebook_cover_image');
+      if(coverImg){ var coverUrl = coverImg.getAttribute('data-cover-url'); if(coverUrl){ coverImg.src = coverUrl; } else if(images.length){ coverImg.src = images[0]; } }
+      function showCover(){ if(coverOverlay){ coverOverlay.classList.remove('hidden'); } flipEl.style.visibility = 'hidden'; }
+      function hideCover(){ if(coverOverlay){ coverOverlay.classList.add('hidden'); } flipEl.style.visibility = 'visible'; }
+      function updateInfo(){ var idx = pf.getCurrentPageIndex(); var txt = idx === 0 ? 'Cover' : ('Hal ' + idx + ' - ' + (idx+1)); pageInfo.textContent = txt; var total = pf.getPageCount(); if(prevBtn) prevBtn.disabled = (idx === 0); if(nextBtn) nextBtn.disabled = (idx >= total-1); if(idx === 0) showCover(); else hideCover(); }
+      function applyZoom(){ var idx = pf.getCurrentPageIndex(); var shift = (idx === 0 ? 0 : 0); zoomInfo.textContent = Math.round(currentZoom*100)+'%'; var flip = document.getElementById('ebook_flipbook'); if(flip){ flip.style.transformOrigin = 'center center'; flip.style.transform = 'scale('+currentZoom+') translateX('+shift+'%)'; } }
+      showCover(); applyZoom(); updateInfo();
+      pf.on('flip', function(){ if(isSoundEnabled) playPaperSound(); updateInfo(); applyZoom(); });
+      var prevBtn = document.getElementById('ebook_prev'); var nextBtn = document.getElementById('ebook_next'); var zin = document.getElementById('ebook_zoom_in'); var zout = document.getElementById('ebook_zoom_out'); var soundBtn = document.getElementById('ebook_sound');
+      if(prevBtn) prevBtn.addEventListener('click', function(){ var idx = pf.getCurrentPageIndex(); if(idx === 0){ return; } pf.flipPrev(); });
+      if(nextBtn) nextBtn.addEventListener('click', function(){ var idx = pf.getCurrentPageIndex(); if(idx === 0){ hideCover(); } pf.flipNext(); });
+      if(zin) zin.addEventListener('click', function(){ currentZoom = Math.min(2.0, currentZoom+0.1); applyZoom(); });
+      if(zout) zout.addEventListener('click', function(){ currentZoom = Math.max(0.5, currentZoom-0.1); applyZoom(); });
+      if(soundBtn) soundBtn.addEventListener('click', function(){ isSoundEnabled = !isSoundEnabled; soundBtn.style.opacity = isSoundEnabled ? '1' : '0.5'; });
     })
     .catch(function(err){ if(noteEl){ noteEl.classList.remove('hidden'); noteEl.textContent = 'Gagal memuat preview: '+(err && err.message ? err.message : err); } });
 })();

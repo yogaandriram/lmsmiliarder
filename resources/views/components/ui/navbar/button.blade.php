@@ -22,3 +22,4 @@
     <i class="{{ $icon }} {{ $iconColor }}"></i>
   </button>
 @endif
+

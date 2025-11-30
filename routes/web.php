@@ -74,6 +74,12 @@ Route::middleware(['auth','admin'])
         Route::post('course-verifications/{course}/approve', [CourseVerificationController::class, 'approve'])->name('course_verifications.approve');
         Route::post('course-verifications/{course}/reject', [CourseVerificationController::class, 'reject'])->name('course_verifications.reject');
 
+        // Verifikasi E-book
+        Route::get('ebook-verifications', [\App\Http\Controllers\Admin\EbookVerificationController::class, 'index'])->name('ebook_verifications.index');
+        Route::get('ebook-verifications/{ebook}', [\App\Http\Controllers\Admin\EbookVerificationController::class, 'show'])->name('ebook_verifications.show');
+        Route::post('ebook-verifications/{ebook}/approve', [\App\Http\Controllers\Admin\EbookVerificationController::class, 'approve'])->name('ebook_verifications.approve');
+        Route::post('ebook-verifications/{ebook}/reject', [\App\Http\Controllers\Admin\EbookVerificationController::class, 'reject'])->name('ebook_verifications.reject');
+
         // Transaksi - verifikasi pembayaran
         Route::get('transactions/pending', [AdminTransactionController::class, 'pending'])->name('transactions.pending');
         Route::post('transactions/{transaction}/verify', [AdminTransactionController::class, 'verify'])->name('transactions.verify');
@@ -89,6 +95,10 @@ Route::middleware(['auth','admin'])
 
         // Kelola User
         Route::resource('users', AdminUserController::class)->only(['index','create','store','show','edit','update','destroy']);
+
+        // Kelola Mentor
+        Route::get('mentors', [\App\Http\Controllers\Admin\MentorManageController::class, 'index'])
+            ->name('mentors.index');
 
         // Settings
         Route::get('settings', [AdminSettingsController::class, 'index'])->name('settings.index');
