@@ -43,10 +43,10 @@
     <x-ui.sidebar.section title="Manage Transaksi">
       <x-ui.sidebar.item href="#" icon="fa-solid fa-credit-card" label="Berlangganan" />
       <x-ui.sidebar.item href="{{ route('admin.transactions.pending') }}" icon="fa-solid fa-money-check-dollar" label="Transaksi" :active="$isTransactions" />
-      <x-ui.sidebar.item href="{{ route('admin.settings.index') }}" icon="fa-solid fa-building-columns" label="Rekening Admin" />
     </x-ui.sidebar.section>
 
-    <x-ui.sidebar.section title="Manage Notifications">
+    <x-ui.sidebar.section title="Interaksi">
+      <x-ui.sidebar.item href="{{ route('admin.discussions.index') }}" icon="fa-solid fa-comments" label="Diskusi" />
       <x-ui.sidebar.item href="{{ route('admin.announcements.index') }}" icon="fa-solid fa-bullhorn" label="Pengumuman" />
     </x-ui.sidebar.section>
 

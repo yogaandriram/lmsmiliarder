@@ -87,6 +87,12 @@ Route::middleware(['auth','admin'])
         // Pengumuman
         Route::resource('announcements', AnnouncementController::class)->only(['index','store','destroy']);
 
+        // Diskusi
+        Route::get('discussions', [\App\Http\Controllers\Admin\DiscussionController::class, 'index'])->name('discussions.index');
+        Route::get('discussions/{group}/chat', [\App\Http\Controllers\Admin\DiscussionController::class, 'chat'])->name('discussions.chat');
+        Route::post('discussions/{group}/chat', [\App\Http\Controllers\Admin\DiscussionController::class, 'postMessage'])->name('discussions.chat.post');
+        Route::get('discussions/{group}/messages', [\App\Http\Controllers\Admin\DiscussionController::class, 'fetchMessages'])->name('discussions.chat.fetch');
+
         // Rekening bank admin
         Route::resource('admin-bank-accounts', AdminBankAccountController::class)->only(['store','update','destroy']);
 
