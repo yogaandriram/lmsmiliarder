@@ -47,6 +47,7 @@ class DiscussionController extends Controller
             'file_url' => $filePath ? \Illuminate\Support\Facades\Storage::url($filePath) : null,
             'original_name' => $original,
             'mime_type' => $mime,
+            'created_at' => now(),
         ]);
         return redirect()->route('admin.discussions.chat', $group);
     }
@@ -61,7 +62,7 @@ class DiscussionController extends Controller
                 return [
                     'user' => $m->user->name,
                     'avatar' => $m->user->avatar_url,
-                    'time' => optional($m->created_at)->format('H:i'),
+                    'time' => \Illuminate\Support\Carbon::parse($m->created_at)->format('H:i'),
                     'content' => $m->content,
                     'file_url' => $m->file_url,
                     'original_name' => $m->original_name,
@@ -71,4 +72,3 @@ class DiscussionController extends Controller
         return response()->json(['messages' => $messages]);
     }
 }
-

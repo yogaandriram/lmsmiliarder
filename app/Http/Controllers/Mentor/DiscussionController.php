@@ -64,6 +64,7 @@ class DiscussionController extends Controller
             'file_url' => $fileUrl,
             'mime_type' => $mime,
             'original_name' => $orig,
+            'created_at' => now(),
         ]);
         return redirect()->route('mentor.discussions.chat', $group);
     }

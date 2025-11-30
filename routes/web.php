@@ -57,6 +57,9 @@ Route::middleware(['auth','admin'])
         // Kategori & Tag
         Route::resource('categories', AdminCategoryController::class)->only(['index','create','store','edit','update','destroy']);
         Route::resource('tags', AdminTagController::class)->only(['index','create','store','edit','update','destroy']);
+        // Semua konten
+        Route::get('courses', [\App\Http\Controllers\Admin\CourseContentController::class, 'index'])->name('courses.index');
+        Route::get('ebooks', [\App\Http\Controllers\Admin\EbookContentController::class, 'index'])->name('ebooks.index');
 
         // Toggle aktif/non-aktif
         Route::patch('categories/{category}/toggle', [AdminCategoryController::class, 'toggle'])->name('categories.toggle');

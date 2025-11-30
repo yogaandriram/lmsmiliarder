@@ -26,7 +26,8 @@
     <x-ui.sidebar.section title="Manage Content">
       <x-ui.sidebar.item href="{{ route('admin.categories.index') }}" icon="fa-solid fa-folder" label="Kategori" :active="$isCategories" />
       <x-ui.sidebar.item href="{{ route('admin.tags.index') }}" icon="fa-solid fa-tags" label="Tags" :active="$isTags" />
-      <x-ui.sidebar.item href="#" icon="fa-solid fa-chart-simple" label="Level" />
+      <x-ui.sidebar.item href="{{ route('admin.courses.index') }}" icon="fa-solid fa-book-open" label="Kursus" />
+      <x-ui.sidebar.item href="{{ route('admin.ebooks.index') }}" icon="fa-solid fa-book" label="E-Book" />
     </x-ui.sidebar.section>
 
     <x-ui.sidebar.section title="Content Verification">
