@@ -57,6 +57,11 @@ class CourseController extends Controller
             'tags.*' => 'exists:tags,id',
             'intro_video_url' => 'nullable|url',
             'enable_discussion' => 'nullable',
+            'subscription_type' => 'required|in:lifetime,date_range,duration',
+            'subscription_start_date' => 'nullable|date',
+            'subscription_end_date' => 'nullable|date|after_or_equal:subscription_start_date',
+            'subscription_duration_value' => 'nullable|integer|min:1',
+            'subscription_duration_unit' => 'nullable|in:days,months',
         ]);
 
         $slug = $this->makeUniqueSlug($validated['title']);
@@ -71,7 +76,19 @@ class CourseController extends Controller
             'author_id' => Auth::id(),
             'verification_status' => 'pending',
             'intro_video_url' => $validated['intro_video_url'] ?? null,
+            'subscription_type' => $validated['subscription_type'] ?? 'lifetime',
+            'subscription_start_date' => null,
+            'subscription_end_date' => null,
+            'subscription_duration_value' => null,
+            'subscription_duration_unit' => null,
         ];
+        if ($data['subscription_type'] === 'date_range') {
+            $data['subscription_start_date'] = $validated['subscription_start_date'] ?? null;
+            $data['subscription_end_date'] = $validated['subscription_end_date'] ?? null;
+        } elseif ($data['subscription_type'] === 'duration') {
+            $data['subscription_duration_value'] = $validated['subscription_duration_value'] ?? null;
+            $data['subscription_duration_unit'] = $validated['subscription_duration_unit'] ?? null;
+        }
         if ($request->hasFile('thumbnail')) {
             $path = $request->file('thumbnail')->store('course_thumbnails/'.Auth::id(), 'public');
             $data['thumbnail_url'] = Storage::url($path);
@@ -144,6 +161,11 @@ class CourseController extends Controller
             'intro_video_url' => 'nullable|url',
             'enable_discussion' => 'nullable',
             'slug' => 'nullable|string|max:255',
+            'subscription_type' => 'required|in:lifetime,date_range,duration',
+            'subscription_start_date' => 'nullable|date',
+            'subscription_end_date' => 'nullable|date|after_or_equal:subscription_start_date',
+            'subscription_duration_value' => 'nullable|integer|min:1',
+            'subscription_duration_unit' => 'nullable|in:days,months',
         ]);
 
         $newSlug = isset($validated['slug']) && trim($validated['slug']) !== ''
@@ -158,7 +180,19 @@ class CourseController extends Controller
             'mentor_share_percent' => $validated['mentor_share_percent'],
             'status' => $validated['status'],
             'intro_video_url' => $validated['intro_video_url'] ?? null,
+            'subscription_type' => $validated['subscription_type'] ?? $course->subscription_type ?? 'lifetime',
+            'subscription_start_date' => null,
+            'subscription_end_date' => null,
+            'subscription_duration_value' => null,
+            'subscription_duration_unit' => null,
         ];
+        if ($data['subscription_type'] === 'date_range') {
+            $data['subscription_start_date'] = $validated['subscription_start_date'] ?? null;
+            $data['subscription_end_date'] = $validated['subscription_end_date'] ?? null;
+        } elseif ($data['subscription_type'] === 'duration') {
+            $data['subscription_duration_value'] = $validated['subscription_duration_value'] ?? null;
+            $data['subscription_duration_unit'] = $validated['subscription_duration_unit'] ?? null;
+        }
         if ($data['status'] === 'published' && $course->verification_status !== 'approved') {
             $data['status'] = 'draft';
             session()->flash('warning', 'Kursus belum diverifikasi admin. Status diubah menjadi Draft.');

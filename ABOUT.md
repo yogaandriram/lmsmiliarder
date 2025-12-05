@@ -284,4 +284,41 @@ Ikonografi: Seluruh ikon yang digunakan dalam sistem harus bersumber dari librar
   - Endpoint create/update kursus menerima `mentor_share_percent` dan memvalidasi 0..100.
   - `admin_share_percent` dihitung di service layer; tidak perlu disimpan (kecuali untuk kebutuhan auditing).
 - Auditing (Opsional):
-  - Sistem dapat menyimpan nilai perhitungan `mentor_earning` dan `admin_commission` per item transaksi untuk pelacakan laporan.
+- Sistem dapat menyimpan nilai perhitungan `mentor_earning` dan `admin_commission` per item transaksi untuk pelacakan laporan.
+
+5.8 Sistem Komisi Penjualan (Kursus & E-book)
+
+- Tujuan: Mengatur bagi hasil otomatis antara Mentor dan Admin setiap kali ada penjualan produk (kursus atau e-book). Mendukung pengaturan default di level platform, override di level mentor, serta pengaturan per produk.
+- Skema Data:
+  - Tambah kolom di `ebooks`:
+    - `mentor_share_percent` int [not null, default: 80, range: 0..100]
+  - Tambah opsi audit (opsional tapi direkomendasikan) di `transaction_details`:
+    - `mentor_earning` decimal(12,2) [nullable]
+    - `admin_commission` decimal(12,2) [nullable]
+  - Default platform:
+    - Admin dapat mengatur default persen komisi untuk Kursus dan E-book secara global (mis. Kursus: 80/20, E-book: 80/20). Default ini dipakai saat membuat konten baru dan saat kolom bagi hasil pada produk belum diisi.
+- Aturan & Validasi:
+  - Rentang persen 0..100. Total Admin + Mentor selalu 100.
+  - Perhitungan komisi selalu dari `effective_price` item setelah kupon/diskon, tidak negatif.
+  - Override prioritas: Per Produk > Per Mentor (opsional) > Default Platform.
+- Perilaku UI
+  - Settings Admin (pages.admin.settings.index):
+    - Tab baru “Komisi” yang memuat:
+      - Default komisi Kursus (% Mentor, otomatis % Admin).
+      - Default komisi E-book (% Mentor, otomatis % Admin).
+      - Opsional: Tabel override per mentor (jika diaktifkan), termasuk batas minimum/maksimum.
+      - Penjelasan formula dan contoh hitung berdasarkan `effective_price`.
+  - Settings Mentor (pages.mentor.settings):
+    - Tab baru “Komisi” yang memuat:
+      - Informasi default platform yang berlaku.
+      - Form untuk menetapkan `mentor_share_percent` pada produk mentor (kursus/e-book) atau preferensi default pribadinya (opsional, tunduk pada batas admin).
+      - Penjelasan dampak kupon terhadap komisi.
+- Perhitungan (Transaksi Sukses):
+  - `effective_price` per detail = harga item setelah diskon (min 0).
+  - `mentor_earning` = `effective_price * mentor_share_percent / 100`.
+  - `admin_commission` = `effective_price - mentor_earning`.
+  - Nilai bisa disimpan di `transaction_details` untuk pelaporan; jika tidak disimpan, dihitung on-the-fly saat menampilkan laporan.
+- Pelaporan & Pembayaran (Opsional Tahap Berikutnya):
+  - Laporan pendapatan mentor dan komisi admin per periode.
+  - Rekap per produk dan agregasi per mentor.
+  - Mekanisme payout manual/otomatis berdasarkan saldo periode berjalan.

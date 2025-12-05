@@ -2,7 +2,7 @@
   @auth
     @php
       $role = auth()->user()->role ?? null;
-      $href = $role === 'admin' ? route('admin.dashboard') : ($role === 'mentor' ? route('mentor.dashboard') : route('home'));
+      $href = $role === 'admin' ? route('admin.dashboard') : ($role === 'mentor' ? route('mentor.dashboard') : route('member.dashboard'));
     @endphp
     <a href="{{ $href }}"
        class="inline-flex items-center gap-2 rounded-xl border border-yellow-400/50 px-3 py-1.5

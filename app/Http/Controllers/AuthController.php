@@ -12,8 +12,12 @@ use App\Services\MailketingService;
 
 class AuthController extends Controller
 {
-    public function showLogin()
+    public function showLogin(\Illuminate\Http\Request $request)
     {
+        $ret = $request->query('return');
+        if ($ret) {
+            session()->put('url.intended', $ret);
+        }
         return view('auth.login');
     }
 
@@ -32,6 +36,7 @@ class AuthController extends Controller
             $fallback = match($user->role) {
                 'admin' => route('admin.dashboard'),
                 'mentor' => route('mentor.dashboard'),
+                'member' => route('member.dashboard'),
                 default => route('home')
             };
             return redirect()->intended($fallback);
@@ -42,8 +47,12 @@ class AuthController extends Controller
         ])->withInput($request->only('email'));
     }
 
-    public function showRegister()
+    public function showRegister(\Illuminate\Http\Request $request)
     {
+        $ret = $request->query('return');
+        if ($ret) {
+            session()->put('url.intended', $ret);
+        }
         return view('auth.register');
     }
 
@@ -80,8 +89,8 @@ class AuthController extends Controller
 
         $mailer->send($user->email, $subject, $content);
 
-        // Arahkan ke halaman verifikasi OTP
-        return redirect()->route('otp.show', ['email' => $user->email])
+        $ret = $request->query('return');
+        return redirect()->route('otp.show', ['email' => $user->email, 'return' => $ret])
             ->with('status', 'Akun dibuat. Kode OTP telah dikirim ke email Anda.');
     }
 

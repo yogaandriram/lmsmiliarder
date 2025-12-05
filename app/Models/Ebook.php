@@ -10,7 +10,11 @@ class Ebook extends Model
     use HasFactory;
 
     protected $fillable = [
-        'author_id','title','slug','description','cover_image_url','file_url','price','status','verification_status','verified_at'
+        'author_id','title','slug','description','cover_image_url','file_url','price','mentor_share_percent','status','verification_status','verified_at'
+    ];
+
+    protected $casts = [
+        'mentor_share_percent' => 'integer',
     ];
 
     /**

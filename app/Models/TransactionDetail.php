@@ -9,8 +9,10 @@ class TransactionDetail extends Model
 {
     use HasFactory;
 
+    public $timestamps = false;
+
     protected $fillable = [
-        'transaction_id','product_type','course_id','ebook_id','price','quantity','discount_amount'
+        'transaction_id','product_type','course_id','ebook_id','price'
     ];
 
     /**
@@ -42,6 +44,9 @@ class TransactionDetail extends Model
         if ($this->product_type === 'course' && $this->course) {
             return (int)($this->course->mentor_share_percent ?? 80);
         }
+        if ($this->product_type === 'ebook' && $this->ebook) {
+            return (int)($this->ebook->mentor_share_percent ?? 80);
+        }
         return 0;
     }
 
@@ -67,7 +72,6 @@ class TransactionDetail extends Model
 
     public function getMentorEarningAttribute(): float
     {
-        if ($this->product_type !== 'course') return 0.0;
         $effective = $this->effective_price;
         $percent = (int)$this->mentor_share_percent;
         return (float)number_format(($effective * $percent) / 100, 2, '.', '');
@@ -75,7 +79,6 @@ class TransactionDetail extends Model
 
     public function getAdminCommissionAttribute(): float
     {
-        if ($this->product_type !== 'course') return 0.0;
         $effective = $this->effective_price;
         return (float)number_format($effective - $this->mentor_earning, 2, '.', '');
     }

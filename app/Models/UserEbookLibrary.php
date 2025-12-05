@@ -10,8 +10,8 @@ class UserEbookLibrary extends Model
     use HasFactory;
 
     protected $table = 'user_ebook_library';
-
-    protected $fillable = ['user_id','ebook_id'];
+    public $timestamps = false;
+    protected $fillable = ['user_id','ebook_id','purchased_at'];
 
     /**
      * Get the user that owns this library entry.

@@ -14,6 +14,7 @@
           <a href="{{ route('admin.settings.index', ['tab' => 'accounts']) }}" class="block px-3 py-2 rounded {{ $isTab('accounts') ? 'bg-white/20' : 'bg-white/5' }} text-white">Rekening</a>
           <a href="{{ route('admin.settings.index', ['tab' => 'coupons']) }}" class="block px-3 py-2 rounded {{ $isTab('coupons') ? 'bg-white/20' : 'bg-white/5' }} text-white">Kupon Diskon</a>
           <a href="{{ route('admin.settings.index', ['tab' => 'integrations']) }}" class="block px-3 py-2 rounded {{ $isTab('integrations') ? 'bg-white/20' : 'bg-white/5' }} text-white">Integrations</a>
+          <a href="{{ route('admin.settings.index', ['tab' => 'commissions']) }}" class="block px-3 py-2 rounded {{ $isTab('commissions') ? 'bg-white/20' : 'bg-white/5' }} text-white">Komisi</a>
         </div>
       </aside>
 
@@ -87,6 +88,21 @@
                 </div>
               </div>
             @endforeach
+          </div>
+        @elseif(($tab ?? 'accounts') === 'commissions')
+          <div class="space-y-4">
+            <h3 class="text-xl font-semibold">Pengaturan Komisi</h3>
+            <div class="glass p-4 rounded space-y-3">
+              <h4 class="text-lg font-semibold">Biaya Admin Pencairan</h4>
+              <form method="POST" action="{{ route('admin.settings.commissions.save') }}" class="space-y-3">
+                @csrf
+                <x-ui.crud.input label="Biaya Admin per Pencairan (Rp)" name="commission_admin_fee" type="number" step="0.01" :value="$admin_fee" variant="glass" />
+                <div class="text-white/60 text-xs">Biaya admin akan dicatat pada setiap payout dan tidak mengurangi nilai komisi mentor yang Anda input saat mencairkan.</div>
+                <div class="text-right">
+                  <x-ui.btn-primary type="submit">Simpan</x-ui.btn-primary>
+                </div>
+              </form>
+            </div>
           </div>
         @else
           <div class="text-white/70">Integrations akan tersedia di versi berikutnya.</div>

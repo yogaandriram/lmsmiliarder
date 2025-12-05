@@ -8,8 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class Enrollment extends Model
 {
     use HasFactory;
-
-    protected $fillable = ['user_id','course_id'];
+    public $timestamps = false;
+    protected $fillable = ['user_id','course_id','enrolled_at'];
 
     /**
      * Get the course that this enrollment belongs to.

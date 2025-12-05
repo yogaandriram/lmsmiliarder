@@ -39,7 +39,7 @@
         </div>
         <div class="grid grid-cols-2 gap-3">
           <x-ui.btn-secondary class="w-full justify-center" href="#detail" icon="fa-solid fa-eye">Lihat Selengkapnya</x-ui.btn-secondary>
-          <x-ui.btn-primary class="w-full justify-center" href="#" icon="fa-solid fa-cart-shopping">Daftar Sekarang</x-ui.btn-primary>
+          <x-ui.btn-primary class="w-full justify-center" href="{{ route('checkout.course', $course) }}" icon="fa-solid fa-cart-shopping">Daftar Sekarang</x-ui.btn-primary>
         </div>
         <div class="my-4 border-t border-white/20"></div>
         <div class="grid grid-cols-2 gap-3">

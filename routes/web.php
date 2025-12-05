@@ -16,10 +16,15 @@ use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\SettingsController as AdminSettingsController;
 use App\Http\Controllers\Mentor\DashboardController as MentorDashboardController;
 use App\Http\Controllers\Public\CourseController as PublicCourseController;
+use App\Http\Controllers\Member\DashboardController as MemberDashboardController;
 
 Route::get('/', function () {
     return view('home');
 })->name('home');
+
+// Public Checkout (akses tanpa login)
+Route::get('/checkout/course/{course}', [\App\Http\Controllers\Member\CheckoutController::class, 'course'])->name('checkout.course');
+Route::get('/checkout/ebook/{ebook}', [\App\Http\Controllers\Member\CheckoutController::class, 'ebook'])->name('checkout.ebook');
 
 // Public course preview by slug
 Route::get('/courses/{slug}', [PublicCourseController::class, 'show'])->name('public.courses.show');
@@ -83,9 +88,22 @@ Route::middleware(['auth','admin'])
         Route::post('ebook-verifications/{ebook}/approve', [\App\Http\Controllers\Admin\EbookVerificationController::class, 'approve'])->name('ebook_verifications.approve');
         Route::post('ebook-verifications/{ebook}/reject', [\App\Http\Controllers\Admin\EbookVerificationController::class, 'reject'])->name('ebook_verifications.reject');
 
-        // Transaksi - verifikasi pembayaran
+        // Transaksi
+        Route::get('transactions', [AdminTransactionController::class, 'index'])->name('transactions.index');
         Route::get('transactions/pending', [AdminTransactionController::class, 'pending'])->name('transactions.pending');
+        Route::get('transactions/{transaction}', [AdminTransactionController::class, 'show'])->name('transactions.show');
         Route::post('transactions/{transaction}/verify', [AdminTransactionController::class, 'verify'])->name('transactions.verify');
+
+        // Komisi Admin
+        Route::get('commissions', [\App\Http\Controllers\Admin\CommissionController::class, 'index'])->name('commissions.index');
+        Route::get('commissions/{mentor}', [\App\Http\Controllers\Admin\CommissionController::class, 'show'])->name('commissions.show');
+        Route::post('commissions/{mentor}/payout', [\App\Http\Controllers\Admin\CommissionController::class, 'payout'])->name('commissions.payout');
+
+        // Notifications
+        Route::get('notifications', [\App\Http\Controllers\Admin\NotificationController::class, 'index'])->name('notifications.index');
+
+        // Berlangganan
+        Route::get('subscriptions', [\App\Http\Controllers\Admin\SubscriptionController::class, 'index'])->name('subscriptions.index');
 
         // Pengumuman
         Route::resource('announcements', AnnouncementController::class)->only(['index','store','destroy']);
@@ -111,6 +129,7 @@ Route::middleware(['auth','admin'])
 
         // Settings
         Route::get('settings', [AdminSettingsController::class, 'index'])->name('settings.index');
+        Route::post('settings/commissions', [AdminSettingsController::class, 'saveCommission'])->name('settings.commissions.save');
     });
 
 // Mentor routes
@@ -119,7 +138,7 @@ Route::middleware(['auth','role:mentor'])
     ->name('mentor.')
     ->group(function () {
         Route::get('/', [MentorDashboardController::class, 'index'])->name('dashboard');
-        
+        Route::get('/transactions/{transaction}', [\App\Http\Controllers\Member\TransactionController::class, 'show'])->name('transactions.show');
         // Course Management
         Route::resource('courses', \App\Http\Controllers\Mentor\CourseController::class);
         Route::get('courses/{mentor}/{course}', [\App\Http\Controllers\Mentor\CourseController::class, 'showBySlug'])->name('courses.show.slug');
@@ -141,17 +160,54 @@ Route::middleware(['auth','role:mentor'])
 
         // Navbar pages
         Route::view('notifications', 'pages.mentor.notifications')->name('notifications');
-        Route::view('settings', 'pages.mentor.settings')->name('settings');
+        Route::get('settings', [\App\Http\Controllers\Mentor\SettingsController::class, 'index'])->name('settings');
+        Route::resource('mentor-bank-accounts', \App\Http\Controllers\Mentor\MentorBankAccountController::class)->only(['store','update','destroy']);
+        Route::patch('mentor-bank-accounts/{mentor_bank_account}/default', [\App\Http\Controllers\Mentor\MentorBankAccountController::class, 'setDefault'])->name('mentor-bank-accounts.default');
         Route::get('profile', \App\Http\Controllers\Mentor\ProfileController::class.'@edit')->name('profile');
         Route::post('profile', \App\Http\Controllers\Mentor\ProfileController::class.'@update')->name('profile.update');
         Route::post('profile/documents', \App\Http\Controllers\Mentor\ProfileController::class.'@storeDocument')->name('profile.documents.store');
         Route::post('profile/documents/bulk', \App\Http\Controllers\Mentor\ProfileController::class.'@storeDocumentsBulk')->name('profile.documents.bulk');
+
+        // Commissions
+        Route::get('commissions', [\App\Http\Controllers\Mentor\CommissionController::class, 'index'])->name('commissions.index');
+        Route::post('commissions/request-payout', [\App\Http\Controllers\Mentor\CommissionController::class, 'requestPayout'])->name('commissions.request_payout');
+
+        // Sales
+        Route::get('sales', [\App\Http\Controllers\Mentor\SalesController::class, 'index'])->name('sales.index');
 
         // Discussions
         Route::get('discussions', [\App\Http\Controllers\Mentor\DiscussionController::class, 'index'])->name('discussions.index');
         Route::get('discussions/{group}/chat', [\App\Http\Controllers\Mentor\DiscussionController::class, 'chat'])->name('discussions.chat');
         Route::post('discussions/{group}/chat', [\App\Http\Controllers\Mentor\DiscussionController::class, 'postMessage'])->name('discussions.chat.post');
         Route::get('discussions/{group}/messages', [\App\Http\Controllers\Mentor\DiscussionController::class, 'fetchMessages'])->name('discussions.chat.fetch');
+    });
+
+// Member routes
+Route::middleware(['auth','role:member'])
+    ->prefix('member')
+    ->name('member.')
+    ->group(function () {
+        Route::get('/', [MemberDashboardController::class, 'index'])->name('dashboard');
+        Route::get('/checkout/course/{course}', [\App\Http\Controllers\Member\CheckoutController::class, 'course'])->name('checkout.course');
+        Route::post('/checkout/course/{course}', [\App\Http\Controllers\Member\CheckoutController::class, 'purchaseCourse'])->name('checkout.course.purchase');
+        Route::get('/checkout/ebook/{ebook}', [\App\Http\Controllers\Member\CheckoutController::class, 'ebook'])->name('checkout.ebook');
+        Route::post('/checkout/ebook/{ebook}', [\App\Http\Controllers\Member\CheckoutController::class, 'purchaseEbook'])->name('checkout.ebook.purchase');
+        
+        Route::get('/transactions', [\App\Http\Controllers\Member\TransactionController::class, 'index'])->name('transactions.index');
+        Route::get('/transactions/{transaction}', [\App\Http\Controllers\Member\TransactionController::class, 'show'])->name('transactions.show');
+        Route::get('/subscriptions', [\App\Http\Controllers\Member\SubscriptionController::class, 'index'])->name('subscriptions.index');
+        Route::get('/courses', [\App\Http\Controllers\Member\CourseLibraryController::class, 'index'])->name('courses.index');
+        Route::get('/courses/{course}/learn', [\App\Http\Controllers\Member\CourseStudyController::class, 'show'])->name('courses.learn');
+    });
+
+// Checkout payment routes (member-authenticated), new URL structure: /checkout/payments/{transaction}
+Route::middleware(['auth','role:member'])
+    ->prefix('checkout')
+    ->name('checkout.')
+    ->group(function(){
+        Route::get('/payments/{transaction}', [\App\Http\Controllers\Member\CheckoutController::class, 'showPayment'])->name('payments.show');
+        Route::post('/payments/{transaction}', [\App\Http\Controllers\Member\CheckoutController::class, 'uploadPaymentProof'])->name('payments.upload');
+        Route::get('/transactions/{transaction}', [\App\Http\Controllers\Member\TransactionController::class, 'show'])->name('transactions.show');
     });
 
 // Admin mentor verification detail routes

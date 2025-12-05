@@ -7,7 +7,13 @@
 @php
   $pad = $size === 'sm' ? 'p-3' : 'p-6';
   $iconBox = $size === 'sm' ? 'h-9 w-9' : 'h-12 w-12';
-  $valueSize = $size === 'sm' ? 'text-xl' : 'text-3xl';
+  $valueStr = (string) $value;
+  $len = strlen($valueStr);
+  if ($size === 'sm') {
+    $valueSize = $len >= 16 ? 'text-xs' : ($len >= 12 ? 'text-sm' : 'text-base');
+  } else {
+    $valueSize = $len >= 16 ? 'text-sm' : ($len >= 12 ? 'text-base' : 'text-lg');
+  }
 @endphp
 <div class="glass {{ $pad }} rounded flex items-center gap-4">
   @if($icon)

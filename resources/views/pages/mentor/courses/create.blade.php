@@ -157,6 +157,57 @@
                 </div>
             </div>
 
+            <!-- Masa Berlangganan -->
+            <div class="space-y-4">
+                <h3 class="text-lg font-semibold text-yellow-400 mb-4">Masa Berlangganan</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="subscription_type_group_create">
+                    <label class="flex items-center gap-3 p-4 bg-white/5 rounded-lg hover:bg-white/10 cursor-pointer">
+                        <input type="radio" name="subscription_type" value="lifetime" {{ old('subscription_type','lifetime')=='lifetime' ? 'checked' : '' }} class="text-yellow-400 focus:ring-yellow-400">
+                        <div>
+                            <div class="font-medium">Lifetime</div>
+                            <div class="text-sm text-white/70">Akses seumur hidup</div>
+                        </div>
+                    </label>
+                    <label class="flex items-center gap-3 p-4 bg-white/5 rounded-lg hover:bg-white/10 cursor-pointer">
+                        <input type="radio" name="subscription_type" value="date_range" {{ old('subscription_type')=='date_range' ? 'checked' : '' }} class="text-yellow-400 focus:ring-yellow-400">
+                        <div>
+                            <div class="font-medium">Rentang Tanggal</div>
+                            <div class="text-sm text-white/70">Akses sesuai tanggal mulai–akhir</div>
+                        </div>
+                    </label>
+                    <label class="flex items-center gap-3 p-4 bg-white/5 rounded-lg hover:bg-white/10 cursor-pointer">
+                        <input type="radio" name="subscription_type" value="duration" {{ old('subscription_type')=='duration' ? 'checked' : '' }} class="text-yellow-400 focus:ring-yellow-400">
+                        <div>
+                            <div class="font-medium">Durasi</div>
+                            <div class="text-sm text-white/70">Akses berdasarkan jumlah hari/bulan</div>
+                        </div>
+                    </label>
+                </div>
+                <div id="sub_date_range_create" class="grid grid-cols-1 md:grid-cols-2 gap-4 {{ old('subscription_type')=='date_range' ? '' : 'hidden' }}">
+                    <x-ui.crud.input label="Tanggal Mulai" name="subscription_start_date" type="date" :value="old('subscription_start_date')" variant="glass" />
+                    <x-ui.crud.input label="Tanggal Akhir" name="subscription_end_date" type="date" :value="old('subscription_end_date')" variant="glass" />
+                </div>
+                <div id="sub_duration_create" class="space-y-2 {{ old('subscription_type')=='duration' ? '' : 'hidden' }}">
+                    <label class="block text-sm font-medium text-white/90">Durasi</label>
+                    <div class="flex items-center gap-3">
+                        <div class="w-40">
+                            <x-ui.crud.input id="sub_duration_value_create" name="subscription_duration_value" type="text" inputmode="numeric" placeholder="Jumlah" :value="old('subscription_duration_value')" variant="glass" />
+                        </div>
+                        <div class="flex-1">
+                            <select name="subscription_duration_unit" class="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg focus:ring-2 focus:ring-yellow-400 focus:border-transparent text-white">
+                                <option value="days" {{ old('subscription_duration_unit')=='days' ? 'selected' : '' }} class="bg-gray-800">Hari</option>
+                                <option value="months" {{ old('subscription_duration_unit')=='months' ? 'selected' : '' }} class="bg-gray-800">Bulan</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                @error('subscription_type')<p class="text-red-400 text-sm mt-1">{{ $message }}</p>@enderror
+                @error('subscription_start_date')<p class="text-red-400 text-sm mt-1">{{ $message }}</p>@enderror
+                @error('subscription_end_date')<p class="text-red-400 text-sm mt-1">{{ $message }}</p>@enderror
+                @error('subscription_duration_value')<p class="text-red-400 text-sm mt-1">{{ $message }}</p>@enderror
+                @error('subscription_duration_unit')<p class="text-red-400 text-sm mt-1">{{ $message }}</p>@enderror
+            </div>
+
             <!-- Diskusi Kursus -->
             <div class="space-y-4">
                 <h3 class="text-lg font-semibold text-yellow-400 mb-4">Diskusi Kursus</h3>
@@ -206,6 +257,25 @@
     var sync = function(){ var m = clamp(mentor.value); mentor.value = m; admin.value = 100 - m; };
     mentor.addEventListener('input', sync);
     sync();
+  }
+})();
+</script>
+<script>
+(function(){
+  var radios = document.querySelectorAll('#subscription_type_group_create input[type=radio]');
+  var rangeBox = document.getElementById('sub_date_range_create');
+  var durBox = document.getElementById('sub_duration_create');
+  var durVal = document.getElementById('sub_duration_value_create');
+  var update = function(){
+    var val = 'lifetime';
+    radios.forEach(function(r){ if(r.checked) val = r.value; });
+    if(rangeBox) rangeBox.classList.toggle('hidden', val !== 'date_range');
+    if(durBox) durBox.classList.toggle('hidden', val !== 'duration');
+  };
+  radios.forEach(function(r){ r.addEventListener('change', update); });
+  update();
+  if(durVal){
+    durVal.addEventListener('input', function(){ durVal.value = (durVal.value||'').replace(/[^0-9]/g,''); });
   }
 })();
 </script>

@@ -46,6 +46,53 @@
         </div>
     </div>
 
+    <div class="glass p-6 rounded-lg">
+        <h3 class="text-lg font-semibold text-yellow-400 mb-4">Progress Kursus</h3>
+        @php
+          $hasThumb = !empty($course->thumbnail_url);
+          $hasCategory = !empty($course->category_id);
+          $hasDesc = !empty(trim($course->description ?? ''));
+          $infoDone = $hasThumb && $hasCategory && $hasDesc;
+          $modulesCount = $course->modules->count();
+          $lessonsTotal = $course->modules->sum(fn($m) => $m->lessons->count());
+          $modulesWithoutLessons = $course->modules->filter(fn($m) => $m->lessons->count() === 0)->count();
+          $modDone = $modulesCount > 0 && $modulesWithoutLessons === 0;
+          $quizzesTotal = $course->modules->filter(fn($m) => !is_null($m->quiz))->count();
+          $quizDone = $quizzesTotal > 0;
+        @endphp
+        <div class="flex items-center gap-6 p-4 rounded-lg bg-white/5">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-full flex items-center justify-center {{ $infoDone ? 'bg-green-400 text-black' : 'bg-amber-400 text-black' }}">
+                    <i class="fa-solid fa-book"></i>
+                </div>
+                <div>
+                    <div class="font-medium">Course Info</div>
+                    <div class="text-xs text-white/70">{{ $infoDone ? 'Lengkap' : 'Perlu dilengkapi' }}</div>
+                </div>
+            </div>
+            <div class="flex-1 h-px bg-green-500/30"></div>
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-full flex items-center justify-center {{ $modDone ? 'bg-green-400 text-black' : 'bg-amber-400 text-black' }}">
+                    <i class="fa-solid fa-table-cells-large"></i>
+                </div>
+                <div>
+                    <div class="font-medium">Moduls & Lessons</div>
+                    <div class="text-xs text-white/70">{{ $modulesCount }} modul • {{ $lessonsTotal }} pelajaran @if(!$modDone) • {{ $modulesWithoutLessons }} modul tanpa pelajaran @endif</div>
+                </div>
+            </div>
+            <div class="flex-1 h-px bg-green-500/30"></div>
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-full flex items-center justify-center {{ $quizDone ? 'bg-green-400 text-black' : 'bg-amber-400 text-black' }}">
+                    <i class="fa-solid fa-question"></i>
+                </div>
+                <div>
+                    <div class="font-medium">Quizzes</div>
+                    <div class="text-xs text-white/70">{{ $quizzesTotal }} kuis</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Course Information -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Basic Info -->
@@ -162,6 +209,34 @@
                         <span class="text-white/90">Diperbarui</span>
                         <span class="text-white/70 text-sm">{{ $course->updated_at->diffForHumans() }}</span>
                     </div>
+                </div>
+            </div>
+
+            <div class="glass p-6 rounded-lg">
+                <h3 class="text-lg font-semibold text-yellow-400 mb-4">Masa Berlangganan</h3>
+                @php $stype = $course->subscription_type ?? 'lifetime'; @endphp
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-white/90">Tipe</span>
+                        <span class="text-white/80 text-sm">{{ ucfirst(str_replace('_',' ', $stype)) }}</span>
+                    </div>
+                    @if($stype === 'date_range')
+                        <div class="flex items-center justify-between">
+                            <span class="text-white/90">Tanggal Mulai</span>
+                            <span class="text-white/70 text-sm">{{ optional($course->subscription_start_date)->format('d M Y') ?? '-' }}</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-white/90">Tanggal Akhir</span>
+                            <span class="text-white/70 text-sm">{{ optional($course->subscription_end_date)->format('d M Y') ?? '-' }}</span>
+                        </div>
+                    @elseif($stype === 'duration')
+                        <div class="flex items-center justify-between">
+                            <span class="text-white/90">Durasi</span>
+                            <span class="text-white/70 text-sm">{{ (int)$course->subscription_duration_value }} {{ $course->subscription_duration_unit === 'months' ? 'bulan' : 'hari' }}</span>
+                        </div>
+                    @else
+                        <p class="text-white/70 text-sm">Akses seumur hidup.</p>
+                    @endif
                 </div>
             </div>
 

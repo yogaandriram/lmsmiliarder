@@ -12,6 +12,9 @@
     @csrf
     <input type="hidden" name="email" value="{{ $email ?? old('email') }}" />
     <input type="hidden" name="code" id="otpCode" />
+    @if(isset($return))
+      <input type="hidden" name="return" value="{{ $return }}" />
+    @endif
 
     <div class="flex justify-center gap-3 my-3">
         <input class="otp-box w-12 h-12 rounded-lg border bg-white text-gray-900 text-center text-xl outline-none border-gray-300 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 dark:bg-neutral-900 dark:text-gray-100 dark:border-white/15 dark:focus:ring-yellow-400 dark:focus:border-yellow-400" type="text" inputmode="numeric" maxlength="1" autocomplete="one-time-code" />
@@ -33,6 +36,9 @@
     <form id="resendForm" method="POST" action="{{ route('otp.request') }}" class="flex items-center gap-3">
         @csrf
         <input type="hidden" name="email" value="{{ $email ?? old('email') }}" />
+        @if(isset($return))
+          <input type="hidden" name="return" value="{{ $return }}" />
+        @endif
         <x-ui.btn-secondary type="submit" size="sm" class="disabled:opacity-50 justify-center" id="resendBtn" data-seconds="{{ isset($remainingSeconds) ? max(0, (int)$remainingSeconds) : 60 }}" disabled>Kirim Ulang OTP</x-ui.btn-secondary>
         <span class="text-gray-600 dark:text-gray-400 text-sm" id="countdownText">Kirim Ulang Dalam 0:{{ str_pad(($remainingSeconds ?? 60) % 60, 2, '0', STR_PAD_LEFT) }}</span>
     </form>

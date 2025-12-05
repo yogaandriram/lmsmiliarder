@@ -15,8 +15,19 @@
 
             <!-- Kanan: Notification, Pengaturan, Profile, Logout -->
             <div class="flex items-center gap-3">
-                @php $isAdmin = request()->routeIs('admin.*'); @endphp
-                <x-ui.navbar.button icon="fa-regular fa-bell" variant="glass" href="{{ $isAdmin ? route('admin.announcements.index') : route('mentor.notifications') }}" />
+                @php 
+                  $isAdmin = request()->routeIs('admin.*'); 
+                  $notifCount = 0; 
+                  try { 
+                    $notifCount = \App\Models\Notification::where('recipient_id', auth()->id())->whereNull('read_at')->count(); 
+                  } catch (\Throwable $e) { $notifCount = 0; } 
+                @endphp
+                <a href="{{ $isAdmin ? route('admin.notifications.index') : route('mentor.notifications') }}" class="relative h-10 w-10 flex items-center justify-center rounded-xl glass glass-hover ring-1 ring-yellow-300/25" title="Notifikasi">
+                  <i class="fa-regular fa-bell text-white"></i>
+                  @if($notifCount>0)
+                  <span class="absolute -top-1 -right-1 bg-yellow-400 text-black text-xs px-1.5 py-0.5 rounded-full">{{ $notifCount }}</span>
+                  @endif
+                </a>
                 <x-ui.navbar.button icon="fa-solid fa-gear" variant="glass" href="{{ $isAdmin ? route('admin.settings.index') : route('mentor.settings') }}" />
                 <x-ui.navbar.button icon="fa-solid fa-user" variant="glass" href="{{ $isAdmin ? '#' : route('mentor.profile') }}" />
                 <form method="POST" action="{{ route('logout') }}">

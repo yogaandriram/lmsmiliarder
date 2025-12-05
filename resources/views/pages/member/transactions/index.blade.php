@@ -1,26 +1,26 @@
-@extends('components.layout.app')
+@extends('components.layout.member')
 @section('page_title','Transaksi Saya')
 
 @section('content')
 @php
-  $latest = $transactions->first();
-  $status = $latest ? $latest->payment_status : null;
+  $selected = isset($current) && $current ? $current : null;
+  $status = $selected ? $selected->payment_status : null;
   $statusIcon = $status==='success' ? 'fa-solid fa-circle-check' : ($status==='failed' ? 'fa-solid fa-circle-xmark' : 'fa-solid fa-hourglass-half');
   $statusTitle = $status==='success' ? 'Pembayaran Berhasil' : ($status==='failed' ? 'Pembayaran Dibatalkan' : 'Menunggu Verifikasi');
   $statusDesc = $status==='success' ? 'Terima kasih, pembayaran Anda telah dikonfirmasi.' : ($status==='failed' ? 'Transaksi dibatalkan. Jika ini kesalahan, silakan lakukan checkout kembali.' : 'Pembayaran Anda sedang diproses oleh admin. Biasanya memakan waktu 1–2 jam kerja.');
-  $first = $latest ? $latest->details->first() : null;
+  $first = $selected ? $selected->details->first() : null;
   $prodTitle = $first ? ($first->product_type==='course' ? ($first->course->title ?? 'Kursus') : ($first->ebook->title ?? 'E-book')) : '-';
   $prodType = $first ? ucfirst($first->product_type) : '-';
   $price = $first ? (int)$first->price : 0;
-  $nominal = $latest ? (int)($latest->payable_amount ?? ($latest->final_amount ?? $latest->total_amount)) : 0;
+  $nominal = $selected ? (int)($selected->payable_amount ?? ($selected->final_amount ?? $selected->total_amount)) : 0;
 @endphp
 
 <div class="space-y-8">
   <div class="flex items-center justify-between">
-    <h2 class="text-3xl md:text-4xl font-bold">Status Pembayaran Anda</h2>
+    <h2 class="text-3xl md:text-4xl font-bold">Semua History Transaksi</h2>
   </div>
 
-  @if($latest)
+  @if($selected)
   <div class="glass p-6 rounded flex items-center gap-4">
     <div class="h-12 w-12 rounded-xl bg-linear-to-br from-yellow-500 to-orange-600 flex items-center justify-center shadow-md">
       <i class="{{ $statusIcon }} text-black/90"></i>
@@ -44,16 +44,16 @@
         </tr>
       </x-slot>
       <tr class="border-b border-white/10">
-        <td class="py-3 px-4">#{{ $latest->id }}</td>
+        <td class="py-3 px-4">#{{ $selected->id }}</td>
         <td class="py-3 px-4">{{ $prodTitle }}</td>
         <td class="py-3 px-4">{{ $prodType }}</td>
         <td class="py-3 px-4 text-right">Rp {{ number_format($price,0,',','.') }}</td>
       </tr>
     </x-ui.table>
-    @php $expires = $latest->expires_at ? $latest->expires_at : (optional($latest->transaction_time)?$latest->transaction_time->copy()->addHours(24):null); @endphp
+    @php $expires = $selected && $selected->expires_at ? $selected->expires_at : ($selected && optional($selected->transaction_time)?$selected->transaction_time->copy()->addHours(24):null); @endphp
     <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mt-4">
       <div>Nominal: <strong>Rp {{ number_format($nominal,0,',','.') }}</strong></div>
-      <div>Tanggal Pembayaran: <strong>{{ optional($latest->transaction_time)->format('d M Y, H:i') ?? '-' }}</strong></div>
+      <div>Tanggal Pembayaran: <strong>{{ $selected ? optional($selected->transaction_time)->format('d M Y, H:i') : '-' }}</strong></div>
       <div>Berlaku Hingga: <strong>{{ $expires ? $expires->format('d M Y, H:i') : '-' }}</strong></div>
     </div>
   </div>
@@ -68,7 +68,6 @@
         <th class="text-left py-3 px-4">Item</th>
         <th class="text-right py-3 px-4">Total</th>
         <th class="text-center py-3 px-4">Status</th>
-        <th class="text-right py-3 px-4">Aksi</th>
       </tr>
     </x-slot>
     @forelse($transactions as $t)
@@ -89,19 +88,15 @@
             {{ ucfirst($t->payment_status) }}
           </span>
         </td>
-        <td class="py-3 px-4 text-right">
-          <x-ui.btn-secondary href="{{ route('member.transactions.show', $t) }}" size="sm" icon="fa-solid fa-eye">Lihat</x-ui.btn-secondary>
-        </td>
+        
       </tr>
     @empty
       <tr>
-        <td colspan="6" class="py-8 px-4 text-center text-white/60">Belum ada transaksi.</td>
+        <td colspan="5" class="py-8 px-4 text-center text-white/60">Belum ada transaksi.</td>
       </tr>
     @endforelse
   </x-ui.table>
 
-  @if($transactions->hasPages())
-    <div class="p-4">{{ $transactions->links() }}</div>
-  @endif
+  
 </div>
 @endsection

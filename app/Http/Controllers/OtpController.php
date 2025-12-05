@@ -15,6 +15,7 @@ class OtpController extends Controller
     public function show(Request $request)
     {
         $email = $request->query('email');
+        $return = $request->query('return');
 
         // Hitung sisa detik menuju kedaluwarsa OTP terakhir (untuk countdown UI)
         $remainingSeconds = null;
@@ -33,7 +34,7 @@ class OtpController extends Controller
             }
         }
 
-        return view('auth.verify-otp', compact('email', 'remainingSeconds'));
+        return view('auth.verify-otp', compact('email', 'remainingSeconds','return'));
     }
 
     // Kirim / Request OTP baru (maks 3x per 1 jam)
@@ -114,8 +115,15 @@ class OtpController extends Controller
         // (Opsional) Hapus OTP yang terpakai
         $otp->delete();
 
-        // Loginkan user dan arahkan ke beranda
+        // Loginkan user dan arahkan ke dashboard sesuai role
         Auth::login($user);
-        return redirect()->route('home')->with('status', 'Email berhasil diverifikasi.');
+        $fallback = match($user->role) {
+            'admin' => route('admin.dashboard'),
+            'mentor' => route('mentor.dashboard'),
+            'member' => route('member.dashboard'),
+            default => route('home')
+        };
+        $ret = $request->input('return') ?: session('url.intended');
+        return redirect($ret ?: $fallback)->with('status', 'Email berhasil diverifikasi.');
     }
 }

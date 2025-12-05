@@ -10,6 +10,8 @@
   $isQuizzes = request()->routeIs('mentor.quizzes.*');
   $isDiscussions = request()->routeIs('mentor.discussions.*');
   $isProfile = request()->routeIs('mentor.profile.*');
+  $isCommissions = request()->routeIs('mentor.commissions.*');
+  $isSales = request()->routeIs('mentor.sales.*');
 @endphp
 
 <div class="space-y-6">
@@ -32,7 +34,11 @@
 
     <x-ui.sidebar.section title="Laporan">
       <x-ui.sidebar.item href="#" icon="fa-solid fa-chart-line" label="Analitik" />
-      <x-ui.sidebar.item href="#" icon="fa-solid fa-money-bill-wave" label="Penjualan" />
+    </x-ui.sidebar.section>
+
+    <x-ui.sidebar.section title="Penjualan">
+      <x-ui.sidebar.item href="{{ route('mentor.sales.index') }}" icon="fa-solid fa-money-bill-wave" label="Penjualan" :active="$isSales" />
+      <x-ui.sidebar.item href="{{ route('mentor.commissions.index') }}" icon="fa-solid fa-scale-balanced" label="Komisi" :active="$isCommissions" />
     </x-ui.sidebar.section>
 
     
