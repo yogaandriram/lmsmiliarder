@@ -189,11 +189,6 @@
       <form method="POST" action="{{ route('mentor.courses.modules.quiz.questions.store', [$course,$module]) }}" class="space-y-4">
         @csrf
         <x-ui.crud.textarea label="Pertanyaan" name="question_text" variant="glass"></x-ui.crud.textarea>
-        <label class="block text-sm text-white/80">Tipe Pertanyaan</label>
-        <select name="question_type" id="question_type_select" class="w-full px-4 py-2 bg-white/10 border border-white/20 rounded text-white">
-          <option value="multiple_choice">Pilihan Ganda</option>
-          <option value="essay">Essay</option>
-        </select>
         <div id="mc_fields" class="space-y-2">
           @for($i=0;$i<4;$i++)
             <div class="flex items-center gap-2">
@@ -213,13 +208,8 @@
   </div>
   <script>
   (function(){
-    var sel = document.getElementById('question_type_select');
     var mc = document.getElementById('mc_fields');
-    if(sel && mc){
-      var sync = function(){ mc.style.display = sel.value === 'multiple_choice' ? '' : 'none'; };
-      sel.addEventListener('change', sync);
-      sync();
-    }
+    if(mc){ mc.style.display = ''; }
     window.toggleModal = function(id){
       var el = document.getElementById(id);
       if(!el) return;

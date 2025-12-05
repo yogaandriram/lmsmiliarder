@@ -12,7 +12,11 @@
     $bankName = optional($transaction->adminBankAccount)->bank_name;
     $accountNumber = optional($transaction->adminBankAccount)->account_number;
     $accountHolder = optional($transaction->adminBankAccount)->account_holder_name;
-    $payable = (int)($transaction->payable_amount ?? max(0, (int)($transaction->final_amount ?? $transaction->total_amount) - (int)($transaction->unique_code ?? 0)));
+    $subtotal = (int)($transaction->total_amount ?? 0);
+    $discount = (int)($transaction->discount_amount ?? 0);
+    $final = (int)($transaction->final_amount ?? max(0, $subtotal - $discount));
+    $unique = (int)($transaction->unique_code ?? 0);
+    $payable = (int)($transaction->payable_amount ?? max(0, $final - $unique));
   @endphp
 
   <div class="glass p-6 rounded-lg">
@@ -47,10 +51,26 @@
             <td class="py-3 px-4 text-right">Rp {{ number_format($d->price,0,',','.') }}</td>
           </tr>
         @endforeach
+        <tr>
+          <td colspan="2" class="py-2 px-4 text-white/80">Subtotal</td>
+          <td class="py-2 px-4 text-right font-semibold">Rp {{ number_format($subtotal,0,',','.') }}</td>
+        </tr>
+        <tr>
+          <td colspan="2" class="py-2 px-4 text-white/80">Diskon</td>
+          <td class="py-2 px-4 text-right">- Rp {{ number_format($discount,0,',','.') }}</td>
+        </tr>
+        <tr>
+          <td colspan="2" class="py-2 px-4 text-white/80">Kode Unik</td>
+          <td class="py-2 px-4 text-right">- Rp {{ number_format($unique,0,',','.') }}</td>
+        </tr>
+        <tr>
+          <td colspan="2" class="py-2 px-4 text-white/90">Total Bayar</td>
+          <td class="py-2 px-4 text-right text-xl font-bold">Rp {{ number_format($payable,0,',','.') }}</td>
+        </tr>
       </x-ui.table>
       <div class="flex items-center justify-between mt-3">
-        <span class="text-white/80">Total</span>
-        <span class="text-xl font-bold">Rp {{ number_format((int)$transaction->final_amount ?: (int)$transaction->total_amount,0,',','.') }}</span>
+        <span class="text-white/80">Total Bayar</span>
+        <span class="text-xl font-bold">Rp {{ number_format($payable,0,',','.') }}</span>
       </div>
       @if($transaction->payment_status==='pending' && $transaction->expires_at)
       <div class="mt-3">

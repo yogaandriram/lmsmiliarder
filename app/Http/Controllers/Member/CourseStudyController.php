@@ -33,7 +33,11 @@ class CourseStudyController extends Controller
         $currentIndex = $current ? (int)$allLessons->search(fn($l) => $l->id === $current->id) + 1 : 1;
         $progress = round($currentIndex * 100 / $total);
 
-        return view('pages.member.courses.learn', compact('course','current','progress','total','currentIndex'));
+        $moduleLessons = $current && $current->module ? $current->module->lessons()->orderBy('order')->get() : collect();
+        $moduleTotal = max(1, $moduleLessons->count());
+        $moduleIndex = $current ? (int)$moduleLessons->search(fn($l) => $l->id === $current->id) + 1 : 1;
+        $moduleCompleted = $moduleIndex >= $moduleTotal;
+
+        return view('pages.member.courses.learn', compact('course','current','progress','total','currentIndex','moduleCompleted'));
     }
 }
-

@@ -41,15 +41,6 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label for="price" class="block text-sm font-medium text-white/90 mb-2">Harga (Rp) *</label>
-                        <input type="number" name="price" id="price" value="{{ old('price', 0) }}" required min="0"
-                               class="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg focus:ring-2 focus:ring-yellow-400 focus:border-transparent text-white placeholder-white/50">
-                        @error('price')
-                            <p class="text-red-400 text-sm mt-1">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <div>
                         <label for="cover" class="block text-sm font-medium text-white/90 mb-2">Upload Cover Image</label>
                         <x-ui.crud.input name="cover" id="cover" type="file" accept="image/*" variant="glass" />
                         @error('cover')
@@ -75,6 +66,35 @@
                         <div id="ebook_flipbook_create" class="w-full h-[60vh] bg-black/30 rounded overflow-hidden"></div>
                     </div>
                     <div id="ebook_preview_note_create" class="mt-3 text-white/60 text-sm hidden"></div>
+                </div>
+            </div>
+
+            <!-- Bagi Hasil -->
+            <div class="space-y-4">
+                <h3 class="text-lg font-semibold text-yellow-400 mb-4">Bagi Hasil</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-sm font-medium text-white/90 mb-2 flex items-center gap-2">
+                            Untuk Mentor (%)
+                            <span class="relative group inline-flex items-center">
+                                <i class="fa-solid fa-circle-info text-white/70"></i>
+                                <span class="absolute left-1/2 -translate-x-1/2 mt-6 hidden group-hover:block whitespace-nowrap text-xs bg-black/80 text-white px-3 py-2 rounded shadow z-50">
+                                    Nilai 0..100. Field Admin menyesuaikan agar total selalu 100.
+                                </span>
+                            </span>
+                        </label>
+                        <input type="number" min="0" max="100" name="mentor_share_percent" id="mentor_share_percent_ebook_create"
+                               class="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg focus:ring-2 focus:ring-yellow-400 focus:border-transparent text-white"
+                               value="{{ old('mentor_share_percent', 80) }}" required />
+                        @error('mentor_share_percent')
+                            <p class="text-red-400 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium text-white/90 mb-2">Untuk Admin (%)</label>
+                        <input type="number" min="0" max="100" id="admin_share_percent_ebook_create"
+                               class="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white" value="{{ 100 - (int)old('mentor_share_percent', 80) }}" readonly />
+                    </div>
                 </div>
             </div>
 
@@ -142,6 +162,18 @@
   function renderPdfToFlip(arrayBuffer){ ensureDeps(function(){ window['pdfjsLib'].getDocument({ data: arrayBuffer }).promise.then(function(pdf){ var images=[], tasks=[]; var maxPages=Math.min(pdf.numPages, 30); for(var p=1;p<=maxPages;p++){ tasks.push(pdf.getPage(p).then(function(page){ var viewport=page.getViewport({ scale: 1.5 }); var canvas=document.createElement('canvas'); var ctx=canvas.getContext('2d'); canvas.width=viewport.width; canvas.height=viewport.height; return page.render({ canvasContext: ctx, viewport: viewport }).promise.then(function(){ images.push(canvas.toDataURL('image/jpeg', 0.9)); }); })); } Promise.all(tasks).then(function(){ images.sort(); var pf=new window['St'].PageFlip(flipEl, { width: 800, height: 1100, size: 'stretch', maxShadowOpacity: 0.5, usePortrait: true, showCover: true, mobileScrollSupport: true, flippingTime: 700 }); pf.loadFromImages(images); pf.on('flip', function(){ playPaperSound(); }); }); }); }); }
   function handleFile(){ var f = fileInput && fileInput.files && fileInput.files[0]; if(!f){ return; } var isPdf = /pdf$/i.test(f.type) || /\.pdf$/i.test(f.name); if(!isPdf){ if(noteEl){ noteEl.classList.remove('hidden'); noteEl.textContent='Preview tersedia untuk file PDF.'; } return; } if(noteEl){ noteEl.classList.add('hidden'); } var reader=new FileReader(); reader.onload=function(e){ renderPdfToFlip(e.target.result); }; reader.readAsArrayBuffer(f); }
   if(fileInput){ fileInput.addEventListener('change', handleFile); }
+})();
+</script>
+<script>
+(function(){
+  var mentor = document.getElementById('mentor_share_percent_ebook_create');
+  var admin = document.getElementById('admin_share_percent_ebook_create');
+  if(mentor && admin){
+    var clamp = function(n){ n = parseInt(n,10); if(isNaN(n)) n = 0; return Math.min(100, Math.max(0, n)); };
+    var sync = function(){ var m = clamp(mentor.value); mentor.value = m; admin.value = 100 - m; };
+    mentor.addEventListener('input', sync);
+    sync();
+  }
 })();
 </script>
 @endsection

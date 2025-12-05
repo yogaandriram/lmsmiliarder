@@ -41,6 +41,10 @@
             <div class="text-lg font-bold">Rp {{ number_format($ebook->price, 0, ',', '.') }}</div>
         </div>
         <div class="glass p-4 rounded-lg">
+            <div class="text-sm text-yellow-300">Komisi Mentor</div>
+            <div class="text-lg font-bold">{{ (int)($ebook->mentor_share_percent ?? 80) }}%</div>
+        </div>
+        <div class="glass p-4 rounded-lg">
             <div class="text-sm text-yellow-300">Dibuat</div>
             <div class="text-lg font-bold">{{ $ebook->created_at->format('d M Y') }}</div>
         </div>
@@ -88,14 +92,18 @@
             <!-- File Information -->
             <div class="glass p-6 rounded-lg">
                 <h3 class="text-lg font-semibold text-yellow-400 mb-4">Informasi File</h3>
-                <div class="space-y-3">
-                    <div class="flex items-center justify-between p-3 bg-white/5 rounded-lg">
-                        <span class="text-white/90">URL File E-book</span>
-                        <a href="{{ $ebook->file_url }}" target="_blank" class="text-yellow-400 hover:text-yellow-300 flex items-center gap-2">
-                            <i class="fa-solid fa-external-link-alt"></i>
-                            Lihat File
-                        </a>
-                    </div>
+            <div class="space-y-3">
+                <div class="flex items-center justify-between p-3 bg-white/5 rounded-lg">
+                    <span class="text-white/90">URL File E-book</span>
+                    <a href="{{ $ebook->file_url }}" target="_blank" class="text-yellow-400 hover:text-yellow-300 flex items-center gap-2">
+                        <i class="fa-solid fa-external-link-alt"></i>
+                        Lihat File
+                    </a>
+                </div>
+                <div class="flex items-center justify-between p-3 bg-white/5 rounded-lg">
+                    <span class="text-white/90">Komisi Mentor</span>
+                    <span class="text-white/80">{{ (int)($ebook->mentor_share_percent ?? 80) }}%</span>
+                </div>
                     @if($ebook->cover_image_url)
                         <div class="flex items-center justify-between p-3 bg-white/5 rounded-lg">
                             <span class="text-white/90">URL Cover Image</span>

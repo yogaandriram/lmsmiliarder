@@ -40,6 +40,7 @@ class EbookController extends Controller
             'cover_image_url' => 'nullable|url',
             'file' => 'required|file|mimes:pdf,epub,txt|max:20480',
             'price' => 'required|numeric|min:0',
+            'mentor_share_percent' => 'required|integer|min:0|max:100',
             'status' => 'required|in:draft,published,archived',
         ]);
 
@@ -67,7 +68,9 @@ class EbookController extends Controller
             'cover_image_url' => $coverUrl,
             'file_url' => $storedUrl,
             'price' => $validated['price'],
+            'mentor_share_percent' => (int)$validated['mentor_share_percent'],
             'status' => $validated['status'],
+            'verification_status' => 'pending',
             'author_id' => $authorId,
         ]);
 
@@ -100,6 +103,7 @@ class EbookController extends Controller
             'file' => 'nullable|file|mimes:pdf,epub,txt|max:20480',
             'file_url' => 'nullable|url',
             'price' => 'required|numeric|min:0',
+            'mentor_share_percent' => 'required|integer|min:0|max:100',
             'status' => 'required|in:draft,published,archived',
         ]);
 
@@ -126,15 +130,21 @@ class EbookController extends Controller
             $fileUrl = $validated['file_url'];
         }
 
-        $ebook->update([
+        $data = [
             'title' => $validated['title'],
             'slug' => $slug,
             'description' => $validated['description'],
             'cover_image_url' => $coverUrl,
             'file_url' => $fileUrl,
             'price' => $validated['price'],
+            'mentor_share_percent' => (int)$validated['mentor_share_percent'],
             'status' => $validated['status'],
-        ]);
+        ];
+        if ($data['status'] === 'published' && ($ebook->verification_status ?? 'pending') !== 'approved') {
+            $data['status'] = 'draft';
+            session()->flash('warning', 'E-book belum diverifikasi admin. Status diubah menjadi Draft.');
+        }
+        $ebook->update($data);
 
         return redirect()->route('mentor.ebooks.index')->with('success', 'E-book berhasil diperbarui!');
     }

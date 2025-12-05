@@ -27,16 +27,27 @@ class CheckoutController extends Controller
 
     public function course(Course $course)
     {
+        if (($course->verification_status ?? 'pending') !== 'approved') {
+            return redirect()->route('public.courses.show', $course->slug)
+                ->with('error', 'Kursus belum disetujui admin dan tidak dapat dijual.');
+        }
         return view('pages.public.checkout.course', compact('course'));
     }
 
     public function ebook(Ebook $ebook)
     {
+        if (($ebook->verification_status ?? 'pending') !== 'approved') {
+            return redirect()->route('home')
+                ->with('error', 'E-book belum disetujui admin dan tidak dapat dijual.');
+        }
         return view('pages.public.checkout.ebook', compact('ebook'));
     }
 
     public function purchaseCourse(Request $request, Course $course)
     {
+        if (($course->verification_status ?? 'pending') !== 'approved') {
+            return back()->with('error', 'Kursus belum disetujui admin dan tidak dapat dibeli.');
+        }
         $price = max(0, (int)($course->price ?? 0));
         $code = trim((string)$request->input('coupon_code'));
         $discount = 0.0;
@@ -75,7 +86,7 @@ class CheckoutController extends Controller
             'admin_bank_account_id' => $bankId > 0 ? $bankId : null,
             'unique_code' => $unique,
             'payable_amount' => $payable,
-            'expires_at' => Carbon::now()->addHours(24),
+            'expires_at' => Carbon::now()->addHours(72),
         ]);
 
         TransactionDetail::create([
@@ -100,6 +111,9 @@ class CheckoutController extends Controller
 
     public function purchaseEbook(Request $request, Ebook $ebook)
     {
+        if (($ebook->verification_status ?? 'pending') !== 'approved') {
+            return back()->with('error', 'E-book belum disetujui admin dan tidak dapat dibeli.');
+        }
         $price = max(0, (int)($ebook->price ?? 0));
         $code = trim((string)$request->input('coupon_code'));
         $discount = 0.0;
@@ -138,7 +152,7 @@ class CheckoutController extends Controller
             'admin_bank_account_id' => $bankId > 0 ? $bankId : null,
             'unique_code' => $unique,
             'payable_amount' => $payable,
-            'expires_at' => Carbon::now()->addHours(24),
+            'expires_at' => Carbon::now()->addHours(72),
         ]);
 
         TransactionDetail::create([

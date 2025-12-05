@@ -10,8 +10,8 @@
 
     <x-ui.sidebar.section title="Kelas Saya">
       <x-ui.sidebar.item href="{{ route('member.courses.index') }}" icon="fa-solid fa-book-open" label="Kursus" :active="request()->routeIs('member.courses.*')" />
-      <x-ui.sidebar.item href="#" icon="fa-solid fa-book" label="E-book" />
-      <x-ui.sidebar.item href="#" icon="fa-solid fa-comments" label="Diskusi" />
+      <x-ui.sidebar.item href="{{ route('member.ebooks.index') }}" icon="fa-solid fa-book" label="E-book" :active="request()->routeIs('member.ebooks.*')" />
+      <x-ui.sidebar.item href="{{ route('member.discussions.index') }}" icon="fa-solid fa-comments" label="Diskusi" :active="request()->routeIs('member.discussions.*')" />
     </x-ui.sidebar.section>
 
     <x-ui.sidebar.section title="Transaksi & Langganan">

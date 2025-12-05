@@ -25,6 +25,6 @@ class TransactionController extends Controller
             ->with('details.course','details.ebook')
             ->orderByDesc('transaction_time')
             ->get();
-        return view('pages.member.transactions.index', ['transactions' => $transactions, 'current' => $transaction]);
+        return view('pages.checkout.transactions.show', ['transactions' => $transactions, 'current' => $transaction]);
     }
 }

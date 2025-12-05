@@ -23,6 +23,7 @@
                 <th class="text-left py-3 px-4">E-book</th>
                 <th class="text-left py-3 px-4">Deskripsi</th>
                 <th class="text-center py-3 px-4">Harga</th>
+                <th class="text-center py-3 px-4">Komisi Mentor</th>
                 <th class="text-center py-3 px-4">Status</th>
                 <th class="text-center py-3 px-4">Verifikasi</th>
                 <th class="text-center py-3 px-4">Dibuat</th>
@@ -45,6 +46,9 @@
             </td>
             <td class="text-center py-3 px-4">
                 <span class="font-semibold">Rp {{ number_format($ebook->price, 0, ',', '.') }}</span>
+            </td>
+            <td class="text-center py-3 px-4">
+                <span class="text-sm text-white/80">{{ (int)($ebook->mentor_share_percent ?? 80) }}%</span>
             </td>
             <td class="text-center py-3 px-4">
                 @if($ebook->status == 'published')

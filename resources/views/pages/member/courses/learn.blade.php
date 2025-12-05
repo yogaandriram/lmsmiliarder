@@ -19,6 +19,17 @@
                 <span class="text-xs text-white/60">{{ $les->duration_minutes ? $les->duration_minutes.'m' : '' }}</span>
               </a>
             @endforeach
+            @if($mod->quiz)
+              <div class="flex items-center justify-between px-3 py-2 rounded bg-white/5">
+                <div class="flex items-center gap-2 text-sm">
+                  <span>Kuis Modul</span>
+                  @if($current && $current->module && $mod->id === $current->module->id && !$moduleCompleted)
+                    <i class="fa-solid fa-lock text-white/60" title="Tonton semua video modul untuk membuka kuis"></i>
+                  @endif
+                </div>
+                <span class="text-xs text-white/60">{{ $mod->quiz->time_limit_minutes ? $mod->quiz->time_limit_minutes.'m' : '' }}</span>
+              </div>
+            @endif
           </div>
         </div>
       @endforeach
@@ -28,8 +39,28 @@
   <section class="md:col-span-3 space-y-6">
     <div class="glass p-4 rounded">
       <div class="aspect-video w-full rounded overflow-hidden bg-black/30 relative">
-        @if($current && $current->video_url)
-          <iframe src="{{ $current->video_url }}" class="w-full h-full" allowfullscreen></iframe>
+        @php
+          $url = $current ? ($current->video_url ?? '') : '';
+          $embed = null;
+          if ($url) {
+            if (preg_match('/youtu\.be\/(\w+)/', $url, $m)) {
+              $embed = 'https://www.youtube.com/embed/'.$m[1].'?rel=0&modestbranding=1';
+            } elseif (preg_match('/youtube\.com\/(?:watch\?v=|embed\/)([\w-]+)/', $url, $m)) {
+              $embed = 'https://www.youtube.com/embed/'.$m[1].'?rel=0&modestbranding=1';
+            } elseif (preg_match('/vimeo\.com\/(\d+)/', $url, $m)) {
+              $embed = 'https://player.vimeo.com/video/'.$m[1];
+            }
+          }
+        @endphp
+        @if($current && $url)
+          @if($embed)
+            <iframe src="{{ $embed }}" class="w-full h-full" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          @else
+            <video class="w-full h-full" controls preload="metadata">
+              <source src="{{ \Illuminate\Support\Str::startsWith($url, ['http://','https://']) ? $url : asset($url) }}" type="video/mp4">
+              Your browser does not support the video tag.
+            </video>
+          @endif
         @else
           <img src="https://images.unsplash.com/photo-1518976024611-4881f04e2d34?q=80&w=1200&auto=format&fit=crop" class="w-full h-full object-cover" alt="Video placeholder" />
           <div class="absolute inset-0 flex items-center justify-center">
@@ -37,11 +68,11 @@
           </div>
         @endif
       </div>
-      <div class="flex items-center gap-2 mt-3">
+      <div class="flex items-center gap-2 mt-3" data-progress-container data-progress="{{ (int)$progress }}">
         <div class="flex-1 h-2 bg-white/10 rounded overflow-hidden">
-          <div class="h-2 bg-yellow-400" style="width: {{ $progress }}%;"></div>
+          <div class="h-2 bg-yellow-400" data-progress-bar></div>
         </div>
-        <div class="text-sm text-white/70">{{ $progress }}%</div>
+        <div class="text-sm text-white/70">{{ (int)$progress }}%</div>
       </div>
     </div>
 
@@ -59,10 +90,21 @@
       </div>
       <div class="glass p-4 rounded">
         <h3 class="text-lg font-semibold text-yellow-400 mb-2">Lesson Status</h3>
-        <div class="text-sm text-white/80">Lesson Incomplete</div>
-        <div class="text-xs text-white/60">Tonton minimal 80% video untuk menyelesaikan.</div>
+        <div class="text-sm text-white opacity-80">Lesson Incomplete</div>
+        <div class="text-xs text-white opacity-60">Tonton minimal 80% video untuk menyelesaikan.</div>
       </div>
     </div>
+    
   </section>
 </div>
+<script>
+(function(){
+  var wrap = document.querySelector('[data-progress-container]');
+  if(!wrap) return;
+  var val = parseInt(wrap.getAttribute('data-progress')||'0',10);
+  val = Math.max(0, Math.min(100, isNaN(val)?0:val));
+  var bar = wrap.querySelector('[data-progress-bar]');
+  if(bar){ bar.style.width = val + '%'; }
+})();
+</script>
 @endsection

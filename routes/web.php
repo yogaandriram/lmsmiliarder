@@ -188,6 +188,9 @@ Route::middleware(['auth','role:member'])
     ->name('member.')
     ->group(function () {
         Route::get('/', [MemberDashboardController::class, 'index'])->name('dashboard');
+        Route::view('/profile', 'pages.member.profile.index')->name('profile');
+        Route::get('/profile/edit', [\App\Http\Controllers\Member\ProfileController::class, 'edit'])->name('profile.edit');
+        Route::post('/profile', [\App\Http\Controllers\Member\ProfileController::class, 'update'])->name('profile.update');
         Route::get('/checkout/course/{course}', [\App\Http\Controllers\Member\CheckoutController::class, 'course'])->name('checkout.course');
         Route::post('/checkout/course/{course}', [\App\Http\Controllers\Member\CheckoutController::class, 'purchaseCourse'])->name('checkout.course.purchase');
         Route::get('/checkout/ebook/{ebook}', [\App\Http\Controllers\Member\CheckoutController::class, 'ebook'])->name('checkout.ebook');
@@ -197,7 +200,16 @@ Route::middleware(['auth','role:member'])
         Route::get('/transactions/{transaction}', [\App\Http\Controllers\Member\TransactionController::class, 'show'])->name('transactions.show');
         Route::get('/subscriptions', [\App\Http\Controllers\Member\SubscriptionController::class, 'index'])->name('subscriptions.index');
         Route::get('/courses', [\App\Http\Controllers\Member\CourseLibraryController::class, 'index'])->name('courses.index');
+        Route::get('/ebooks', [\App\Http\Controllers\Member\EbookLibraryController::class, 'index'])->name('ebooks.index');
         Route::get('/courses/{course}/learn', [\App\Http\Controllers\Member\CourseStudyController::class, 'show'])->name('courses.learn');
+        Route::view('/notifications', 'pages.member.notifications')->name('notifications');
+        Route::view('/settings', 'pages.member.settings')->name('settings');
+
+        // Discussions
+        Route::get('/discussions', [\App\Http\Controllers\Member\DiscussionController::class, 'index'])->name('discussions.index');
+        Route::get('/discussions/{group}', [\App\Http\Controllers\Member\DiscussionController::class, 'chat'])->name('discussions.chat');
+        Route::post('/discussions/{group}/messages', [\App\Http\Controllers\Member\DiscussionController::class, 'postMessage'])->name('discussions.chat.post');
+        Route::get('/discussions/{group}/messages', [\App\Http\Controllers\Member\DiscussionController::class, 'fetchMessages'])->name('discussions.chat.fetch');
     });
 
 // Checkout payment routes (member-authenticated), new URL structure: /checkout/payments/{transaction}

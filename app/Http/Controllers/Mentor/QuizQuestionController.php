@@ -35,7 +35,7 @@ class QuizQuestionController extends Controller
 
         $validated = $request->validate([
             'question_text' => ['required','string'],
-            'question_type' => ['required','in:multiple_choice,essay'],
+            'question_type' => ['nullable','in:multiple_choice'],
             'order' => ['nullable','integer','min:1'],
             'options' => ['array'],
             'options.*.text' => ['nullable','string'],
@@ -43,12 +43,11 @@ class QuizQuestionController extends Controller
             'options.*.is_correct' => ['nullable'],
         ]);
         Log::info('quiz_question.store:validated', [
-            'question_type' => $validated['question_type'],
+            'question_type' => $validated['question_type'] ?? 'multiple_choice',
             'options_count' => is_array($request->input('options')) ? count($request->input('options')) : 0,
         ]);
 
-        $type = str_replace('-', '_', strtolower($validated['question_type']));
-        if (!in_array($type, ['multiple_choice','essay'])) { $type = 'essay'; }
+        $type = 'multiple_choice';
         $q = null;
         try {
         DB::transaction(function() use (&$q, $quiz, $validated, $type, $request) {

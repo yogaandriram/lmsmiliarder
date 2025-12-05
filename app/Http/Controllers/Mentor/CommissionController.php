@@ -36,21 +36,27 @@ class CommissionController extends Controller
             ->withQueryString();
 
         $totalItems = (clone $base)->count();
-        $totalMentor = (float) (clone $base)->sum('mentor_earning');
-        $totalAdmin = (float) (clone $base)->sum('admin_commission');
-        if ($totalMentor <= 0.0 && $totalAdmin <= 0.0) {
-            (clone $base)->with(['transaction','course','ebook'])
-                ->orderBy('id')
-                ->chunkById(1000, function($rows) use (&$totalMentor, &$totalAdmin) {
-                    foreach ($rows as $d) {
-                        $totalMentor += (float)$d->mentor_earning;
-                        $totalAdmin += (float)$d->admin_commission;
-                    }
-                }, $column = 'id');
-        }
+        $sumM = 0.0; $sumA = 0.0;
+        (clone $base)->with(['transaction','course','ebook'])
+            ->orderBy('id')
+            ->chunkById(1000, function($rows) use (&$sumM, &$sumA) {
+                foreach ($rows as $d) {
+                    $sumM += (float)$d->mentor_earning;
+                    $sumA += (float)$d->admin_commission;
+                }
+            }, $column = 'id');
+        $totalMentor = $sumM; $totalAdmin = $sumA;
 
-        $paid = (float) MentorCommissionPayout::where('user_id', $mentorId)->where('status','approved')->sum('amount');
-        $pending = (float) MentorCommissionPayout::where('user_id', $mentorId)->where('status','pending')->sum('amount');
+        $paid = (float) MentorCommissionPayout::where('user_id', $mentorId)
+            ->where('status','approved')
+            ->when($start, function($q) use($start){ $q->where('processed_at', '>=', \Illuminate\Support\Carbon::parse($start)->startOfDay()); })
+            ->when($end, function($q) use($end){ $q->where('processed_at', '<=', \Illuminate\Support\Carbon::parse($end)->endOfDay()); })
+            ->sum('amount');
+        $pending = (float) MentorCommissionPayout::where('user_id', $mentorId)
+            ->where('status','pending')
+            ->when($start, function($q) use($start){ $q->where('requested_at', '>=', \Illuminate\Support\Carbon::parse($start)->startOfDay()); })
+            ->when($end, function($q) use($end){ $q->where('requested_at', '<=', \Illuminate\Support\Carbon::parse($end)->endOfDay()); })
+            ->sum('amount');
         $available = max(0.0, $totalMentor - $paid - $pending);
 
         $payouts = MentorCommissionPayout::with(['bankAccount'])

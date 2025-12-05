@@ -12,6 +12,8 @@
         <th class="text-left py-3 px-4">Mentor</th>
         <th class="text-left py-3 px-4">Kategori</th>
         <th class="text-center py-3 px-4">Harga</th>
+        <th class="text-center py-3 px-4">Verifikasi</th>
+        <th class="text-center py-3 px-4">Siswa</th>
         <th class="text-center py-3 px-4">Status</th>
         <th class="text-center py-3 px-4">Dibuat</th>
       </tr>
@@ -27,6 +29,8 @@
       <td class="py-3 px-4">{{ optional($c->author)->name }}</td>
       <td class="py-3 px-4">{{ optional($c->category)->name }}</td>
       <td class="text-center py-3 px-4">Rp {{ number_format($c->price,0,',','.') }}</td>
+      <td class="text-center py-3 px-4">{{ ucfirst($c->verification_status ?? 'pending') }}</td>
+      <td class="text-center py-3 px-4">{{ (int)($c->enrollments_count ?? 0) }}</td>
       <td class="text-center py-3 px-4">{{ ucfirst($c->status) }}</td>
       <td class="text-center py-3 px-4">{{ optional($c->created_at)->format('d M Y') }}</td>
     </tr>
