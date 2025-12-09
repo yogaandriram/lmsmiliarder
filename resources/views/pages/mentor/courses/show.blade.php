@@ -141,10 +141,30 @@
                                         <p class="text-sm text-white/70">{{ $module->lessons->count() }} pelajaran</p>
                                     </div>
                                     <div class="flex gap-2">
-                                        <x-ui.btn-secondary href="{{ route('mentor.courses.modules.show', [$course, $module]) }}" size="sm" icon="fa-solid fa-eye">Lihat</x-ui.btn-secondary>
-                                        <x-ui.btn-secondary href="#" size="sm" icon="fa-solid fa-edit">Edit</x-ui.btn-secondary>
+                                        <x-ui.btn-secondary href="{{ route('mentor.courses.modules.show', [$course, $module]) }}" size="sm" icon="fa-solid fa-eye" />
+                                        <x-ui.btn-secondary size="sm" icon="fa-solid fa-edit" onclick="toggleModal('modalEditModule_{{ $module->id }}')" />
+                                        <form method="POST" action="{{ route('mentor.courses.modules.destroy', [$course, $module]) }}" onsubmit="return confirm('Hapus modul ini?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <x-ui.btn-secondary type="submit" size="sm" icon="fa-solid fa-trash" />
+                                        </form>
                                     </div>
                                 </div>
+                            </div>
+                            <!-- Modal Edit Modul -->
+                            <div id="modalEditModule_{{ $module->id }}" class="modal-overlay hidden fixed inset-0 z-50 bg-black/60 grid place-items-center" role="dialog" aria-modal="true" aria-labelledby="editModuleTitle_{{ $module->id }}">
+                              <div class="glass p-6 rounded w-full max-w-md">
+                                <h4 id="editModuleTitle_{{ $module->id }}" class="text-lg font-semibold mb-4">Edit Modul</h4>
+                                <form method="POST" action="{{ route('mentor.courses.modules.update', [$course, $module]) }}" class="space-y-3">
+                                  @csrf
+                                  @method('PUT')
+                                  <x-ui.crud.input label="Judul Modul" name="title" required variant="glass" :value="$module->title" autofocus />
+                                  <div class="flex gap-2 justify-end">
+                                    <x-ui.btn-secondary type="button" onclick="toggleModal('modalEditModule_{{ $module->id }}')">Batal</x-ui.btn-secondary>
+                                    <x-ui.btn-primary type="submit" icon="fa-solid fa-save">Simpan</x-ui.btn-primary>
+                                  </div>
+                                </form>
+                              </div>
                             </div>
                         @endforeach
                     </div>
@@ -273,42 +293,44 @@
             </div>
         </div>
     </div>
-</div>
-@endsection
-</div>
-
-<!-- Modal Tambah Modul -->
-<div id="modalAddModule" class="fixed inset-0 w-screen h-screen bg-black/60 z-50 hidden">
-  <div class="glass p-6 rounded w-full max-w-md">
-    <h4 class="text-lg font-semibold mb-4">Tambah Modul</h4>
+<!-- Modal Tambah Modul (dalam section) -->
+<div id="modalAddModule" class="modal-overlay hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm grid place-items-center" role="dialog" aria-modal="true" aria-labelledby="addModuleTitle">
+  <div class="glass p-6 rounded-xl ring-1 ring-black/10 w-full max-w-md">
+    <h4 id="addModuleTitle" class="text-lg font-semibold mb-4">Tambah Modul</h4>
     <form method="POST" action="{{ route('mentor.courses.modules.store', $course) }}" class="space-y-3">
       @csrf
-      <x-ui.crud.input label="Judul Modul" name="title" required variant="glass" />
+      <x-ui.crud.input label="Judul Modul" name="title" required variant="glass" autofocus />
       <div class="flex gap-2 justify-end">
         <x-ui.btn-secondary type="button" onclick="toggleModal('modalAddModule')">Batal</x-ui.btn-secondary>
         <x-ui.btn-primary type="submit" icon="fa-solid fa-save">Simpan</x-ui.btn-primary>
       </div>
     </form>
   </div>
-</div>
+  </div>
 
 <script>
 (function(){
+  function focusFirstInput(modal){
+    try { var input = modal.querySelector('input, textarea, select'); if (input) { input.focus(); } } catch(e) {}
+  }
   window.toggleModal = function(id){
     var el = document.getElementById(id); if(!el) return;
-    el.classList.toggle('hidden');
-    document.body.classList.toggle('overflow-hidden', !el.classList.contains('hidden'));
-  }
+    try { if(el.parentNode !== document.body){ document.body.appendChild(el); } } catch(e){}
+    var hidden = el.classList.contains('hidden');
+    if(hidden){
+      el.classList.remove('hidden');
+      var sw = Math.max(0, window.innerWidth - document.documentElement.clientWidth);
+      if(sw > 0){ document.body.style.paddingRight = sw + 'px'; }
+      document.body.classList.add('overflow-hidden');
+      focusFirstInput(el);
+    } else {
+      el.classList.add('hidden');
+      document.body.classList.remove('overflow-hidden');
+      document.body.style.paddingRight = '';
+    }
+  };
+  document.addEventListener('keydown', function(ev){ if(ev.key === 'Escape'){ document.querySelectorAll('.modal-overlay').forEach(function(m){ if(!m.classList.contains('hidden')) toggleModal(m.id); }); } });
+  document.addEventListener('click', function(ev){ var t = ev.target; if(t && t.classList && t.classList.contains('modal-overlay')){ toggleModal(t.id); } });
 })();
 </script>
-<script>
-(function(){
-  window.toggleModal = window.toggleModal || function(id){
-    var el = document.getElementById(id); if(!el) return;
-    var willShow = el.classList.contains('hidden');
-    el.classList.toggle('hidden');
-    if(willShow){ el.classList.add('grid','place-items-center'); document.body.classList.add('overflow-hidden'); }
-    else { el.classList.remove('grid','place-items-center'); document.body.classList.remove('overflow-hidden'); }
-  }
-})();
-</script>
+@endsection

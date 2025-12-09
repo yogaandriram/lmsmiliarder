@@ -41,6 +41,16 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
+                        <label for="price" class="block text-sm font-medium text-white/90 mb-2">Harga (Rp) *</label>
+                        <input id="price_display_ebook_create" type="text" inputmode="numeric" autocomplete="off"
+                               class="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg focus:ring-2 focus:ring-yellow-400 focus:border-transparent text-white"
+                               value="{{ number_format((int)old('price', 0), 0, ',', '.') }}" placeholder="0">
+                        <input type="hidden" name="price" id="price_value_ebook_create" value="{{ (int)old('price', 0) }}" />
+                        @error('price')
+                            <p class="text-red-400 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <div>
                         <label for="cover" class="block text-sm font-medium text-white/90 mb-2">Upload Cover Image</label>
                         <x-ui.crud.input name="cover" id="cover" type="file" accept="image/*" variant="glass" />
                         @error('cover')
@@ -168,11 +178,31 @@
 (function(){
   var mentor = document.getElementById('mentor_share_percent_ebook_create');
   var admin = document.getElementById('admin_share_percent_ebook_create');
+  var disp = document.getElementById('price_display_ebook_create');
+  var hidden = document.getElementById('price_value_ebook_create');
   if(mentor && admin){
     var clamp = function(n){ n = parseInt(n,10); if(isNaN(n)) n = 0; return Math.min(100, Math.max(0, n)); };
     var sync = function(){ var m = clamp(mentor.value); mentor.value = m; admin.value = 100 - m; };
     mentor.addEventListener('input', sync);
     sync();
+  }
+  if(disp && hidden){
+    var format = function(v){
+      v = (v||'').toString().replace(/[^0-9]/g,'');
+      if(v === ''){ hidden.value = ''; return ''; }
+      hidden.value = parseInt(v,10) || 0;
+      return v.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    };
+    disp.addEventListener('input', function(){
+      var pos = disp.selectionStart;
+      var before = disp.value;
+      disp.value = format(disp.value);
+      if(document.activeElement === disp){
+        var diff = disp.value.length - before.length;
+        disp.setSelectionRange(Math.max(0, pos+diff), Math.max(0, pos+diff));
+      }
+    });
+    disp.value = format(disp.value);
   }
 })();
 </script>

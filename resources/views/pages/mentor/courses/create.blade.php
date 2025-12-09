@@ -235,6 +235,7 @@
   if(disp && hidden){
     var format = function(v){
       v = (v||'').toString().replace(/[^0-9]/g,'');
+      v = v.replace(/^0+(?=\d)/,'');
       if(v === ''){ hidden.value = ''; return ''; }
       hidden.value = parseInt(v,10) || 0;
       return v.replace(/\B(?=(\d{3})+(?!\d))/g, '.');

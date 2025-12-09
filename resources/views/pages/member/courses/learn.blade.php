@@ -1,42 +1,8 @@
-@extends('components.layout.app')
+@extends('components.layout.learn')
 @section('page_title', $current ? ($current->title ?? 'Belajar Kursus') : 'Belajar Kursus')
 @section('content')
-<div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-  <aside class="md:col-span-1 glass p-4 rounded">
-    <div class="flex items-center justify-between mb-3">
-      <div class="font-semibold">Course Content</div>
-      <x-ui.navbar.theme-toggle />
-    </div>
-    <div class="space-y-4">
-      @foreach($course->modules->sortBy('order') as $mod)
-        <div>
-          <div class="text-white/80 font-medium mb-2">{{ $mod->title }}</div>
-          <div class="space-y-1">
-            @foreach($mod->lessons->sortBy('order') as $les)
-              <a href="{{ route('member.courses.learn', [$course, 'lesson' => $les->id]) }}"
-                 class="flex items-center justify-between px-3 py-2 rounded bg-white/5 hover:bg-white/10 {{ ($current && $current->id===$les->id)?'ring-1 ring-yellow-400':'' }}">
-                <span class="text-sm">{{ $les->title }}</span>
-                <span class="text-xs text-white/60">{{ $les->duration_minutes ? $les->duration_minutes.'m' : '' }}</span>
-              </a>
-            @endforeach
-            @if($mod->quiz)
-              <div class="flex items-center justify-between px-3 py-2 rounded bg-white/5">
-                <div class="flex items-center gap-2 text-sm">
-                  <span>Kuis Modul</span>
-                  @if($current && $current->module && $mod->id === $current->module->id && !$moduleCompleted)
-                    <i class="fa-solid fa-lock text-white/60" title="Tonton semua video modul untuk membuka kuis"></i>
-                  @endif
-                </div>
-                <span class="text-xs text-white/60">{{ $mod->quiz->time_limit_minutes ? $mod->quiz->time_limit_minutes.'m' : '' }}</span>
-              </div>
-            @endif
-          </div>
-        </div>
-      @endforeach
-    </div>
-  </aside>
-
-  <section class="md:col-span-3 space-y-6">
+<div class="space-y-6">
+  <section class="space-y-6">
     <div class="glass p-4 rounded">
       <div class="aspect-video w-full rounded overflow-hidden bg-black/30 relative">
         @php

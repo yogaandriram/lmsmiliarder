@@ -12,6 +12,7 @@
   $isProfile = request()->routeIs('mentor.profile.*');
   $isCommissions = request()->routeIs('mentor.commissions.*');
   $isSales = request()->routeIs('mentor.sales.*');
+  $isAnalytics = request()->routeIs('mentor.analytics.*');
 @endphp
 
 <div class="space-y-6">
@@ -33,7 +34,7 @@
     </x-ui.sidebar.section>
 
     <x-ui.sidebar.section title="Laporan">
-      <x-ui.sidebar.item href="#" icon="fa-solid fa-chart-line" label="Analitik" />
+      <x-ui.sidebar.item href="{{ route('mentor.analytics.index') }}" icon="fa-solid fa-chart-line" label="Analitik" :active="$isAnalytics" />
     </x-ui.sidebar.section>
 
     <x-ui.sidebar.section title="Penjualan">

@@ -151,6 +151,8 @@ Route::middleware(['auth','role:mentor'])
         Route::put('courses/{course}/modules/{module}/lessons/{lesson}', [\App\Http\Controllers\Mentor\CourseController::class, 'updateLesson'])->name('courses.modules.lessons.update');
         Route::delete('courses/{course}/modules/{module}/lessons/{lesson}', [\App\Http\Controllers\Mentor\CourseController::class, 'destroyLesson'])->name('courses.modules.lessons.destroy');
         Route::post('courses/{course}/modules', [\App\Http\Controllers\Mentor\CourseController::class, 'storeModule'])->name('courses.modules.store');
+        Route::put('courses/{course}/modules/{module}', [\App\Http\Controllers\Mentor\CourseController::class, 'updateModule'])->name('courses.modules.update');
+        Route::delete('courses/{course}/modules/{module}', [\App\Http\Controllers\Mentor\CourseController::class, 'destroyModule'])->name('courses.modules.destroy');
         // Quiz per modul: hanya satu
         Route::post('courses/{course}/modules/{module}/quiz', [\App\Http\Controllers\Mentor\QuizController::class, 'storeForModule'])->name('courses.modules.quiz.store');
         Route::post('courses/{course}/modules/{module}/quiz/questions', [\App\Http\Controllers\Mentor\QuizQuestionController::class, 'store'])->name('courses.modules.quiz.questions.store');
@@ -174,6 +176,9 @@ Route::middleware(['auth','role:mentor'])
 
         // Sales
         Route::get('sales', [\App\Http\Controllers\Mentor\SalesController::class, 'index'])->name('sales.index');
+
+        // Analytics
+        Route::get('analytics', [\App\Http\Controllers\Mentor\AnalyticsController::class, 'index'])->name('analytics.index');
 
         // Discussions
         Route::get('discussions', [\App\Http\Controllers\Mentor\DiscussionController::class, 'index'])->name('discussions.index');
@@ -202,6 +207,8 @@ Route::middleware(['auth','role:member'])
         Route::get('/courses', [\App\Http\Controllers\Member\CourseLibraryController::class, 'index'])->name('courses.index');
         Route::get('/ebooks', [\App\Http\Controllers\Member\EbookLibraryController::class, 'index'])->name('ebooks.index');
         Route::get('/courses/{course}/learn', [\App\Http\Controllers\Member\CourseStudyController::class, 'show'])->name('courses.learn');
+        Route::get('/courses/{course}/modules/{module}/quiz', [\App\Http\Controllers\Member\QuizController::class, 'show'])->name('courses.modules.quiz.show');
+        Route::post('/courses/{course}/modules/{module}/quiz', [\App\Http\Controllers\Member\QuizController::class, 'submit'])->name('courses.modules.quiz.submit');
         Route::view('/notifications', 'pages.member.notifications')->name('notifications');
         Route::view('/settings', 'pages.member.settings')->name('settings');
 

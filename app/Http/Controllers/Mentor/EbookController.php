@@ -17,6 +17,16 @@ class EbookController extends Controller
             abort(403);
         }
     }
+    private function makeUniqueSlug(string $title, ?int $ignoreId = null): string
+    {
+        $base = Str::slug($title);
+        $slug = $base;
+        $chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+        while (Ebook::where('slug', $slug)->when($ignoreId, function($q) use ($ignoreId){ $q->where('id','!=',$ignoreId); })->exists()) {
+            $slug = $base.'-'.substr(str_shuffle($chars), 0, 1);
+        }
+        return $slug;
+    }
     public function index()
     {
         $ebooks = Ebook::where('author_id', Auth::id())
@@ -44,7 +54,7 @@ class EbookController extends Controller
             'status' => 'required|in:draft,published,archived',
         ]);
 
-        $slug = Str::slug($validated['title']);
+        $slug = $this->makeUniqueSlug($validated['title']);
         $authorId = Auth::id();
         $storedUrl = null;
         $coverUrl = $validated['cover_image_url'] ?? null;
@@ -107,7 +117,7 @@ class EbookController extends Controller
             'status' => 'required|in:draft,published,archived',
         ]);
 
-        $slug = Str::slug($validated['title']);
+        $slug = $this->makeUniqueSlug($validated['title'], $ebook->id);
         $authorId = Auth::id();
         $coverUrl = $ebook->cover_image_url;
         $fileUrl = $ebook->file_url;

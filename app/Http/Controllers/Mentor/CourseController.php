@@ -269,6 +269,25 @@ class CourseController extends Controller
         return redirect()->route('mentor.courses.show', $course)->with('success','Modul berhasil ditambahkan');
     }
 
+    public function updateModule(Request $request, Course $course, Module $module)
+    {
+        $this->ensureOwned($course);
+        if ($module->course_id !== $course->id) abort(404);
+        $validated = $request->validate([
+            'title' => ['required','string','max:255'],
+        ]);
+        $module->update(['title' => $validated['title']]);
+        return redirect()->route('mentor.courses.show', $course)->with('success','Modul berhasil diperbarui');
+    }
+
+    public function destroyModule(Course $course, Module $module)
+    {
+        $this->ensureOwned($course);
+        if ($module->course_id !== $course->id) abort(404);
+        $module->delete();
+        return redirect()->route('mentor.courses.show', $course)->with('success','Modul berhasil dihapus');
+    }
+
     public function showModule(Course $course, Module $module)
     {
         $this->ensureOwned($course);
