@@ -29,6 +29,7 @@
       ->with(['author','category'])
       ->latest()->take(6)->get();
     $ebooks = \App\Models\Ebook::where('status','published')
+      ->where('verification_status','approved')
       ->with('author')
       ->latest()->take(6)->get();
   @endphp

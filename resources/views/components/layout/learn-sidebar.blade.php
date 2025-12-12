@@ -8,7 +8,6 @@
   <div class="px-2">
     <div class="flex items-center justify-between mb-2">
       <div class="font-semibold">Course Content</div>
-      <x-ui.navbar.theme-toggle />
     </div>
     <div class="space-y-4">
       @if($courseVar)

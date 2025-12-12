@@ -22,7 +22,7 @@
           @if($embed)
             <iframe src="{{ $embed }}" class="w-full h-full" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
           @else
-            <video class="w-full h-full" controls preload="metadata">
+            <video id="lessonVideo" class="w-full h-full" controls preload="metadata">
               <source src="{{ \Illuminate\Support\Str::startsWith($url, ['http://','https://']) ? $url : asset($url) }}" type="video/mp4">
               Your browser does not support the video tag.
             </video>
@@ -43,7 +43,10 @@
     </div>
 
     <div class="space-y-2">
-      <h1 class="text-2xl md:text-3xl font-bold">{{ $current ? ($current->title ?? $course->title) : $course->title }}</h1>
+      <div class="flex items-center justify-between">
+        <h1 class="text-2xl md:text-3xl font-bold">{{ $current ? ($current->title ?? $course->title) : $course->title }}</h1>
+        <button id="backBtn" type="button" data-back-url="{{ route('member.courses.index') }}" class="px-3 py-2 rounded bg-white/10 text-white/80 hover:bg-white/20">Kembali</button>
+      </div>
       <div class="text-sm text-white/60">Lesson {{ $currentIndex }} of {{ $total }} | Modul: {{ $current && $current->module ? $current->module->title : '-' }}</div>
     </div>
 
@@ -56,8 +59,14 @@
       </div>
       <div class="glass p-4 rounded">
         <h3 class="text-lg font-semibold text-yellow-400 mb-2">Lesson Status</h3>
-        <div class="text-sm text-white opacity-80">Lesson Incomplete</div>
-        <div class="text-xs text-white opacity-60">Tonton minimal 80% video untuk menyelesaikan.</div>
+        <div class="text-sm text-white opacity-80">{{ $lessonCompleted ? 'Completed' : 'Incomplete' }}</div>
+        <div class="text-xs text-white opacity-60">Klik selesai atau otomatis saat video selesai.</div>
+        @if($current)
+        <form id="completeForm" method="POST" action="{{ route('member.courses.lessons.complete', [$course, $current->id]) }}">
+          @csrf
+          <x-ui.btn-primary type="submit" icon="fa-solid fa-check" class="mt-2">Tandai Selesai</x-ui.btn-primary>
+        </form>
+        @endif
       </div>
     </div>
     
@@ -73,4 +82,23 @@
   if(bar){ bar.style.width = val + '%'; }
 })();
 </script>
+@if($current)
+<script>
+(function(){
+  var v = document.getElementById('lessonVideo');
+  var form = document.getElementById('completeForm');
+  if(v && form){
+    v.addEventListener('ended', function(){ try{ form.submit(); }catch(e){} });
+  }
+  var back = document.getElementById('backBtn');
+  if(back){
+    back.addEventListener('click', function(){
+      var url = back.getAttribute('data-back-url') || '/';
+      try { if (window.history.length > 1) { window.history.back(); } else { window.location.href = url; } }
+      catch(e){ window.location.href = url; }
+    });
+  }
+})();
+</script>
+@endif
 @endsection

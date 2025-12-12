@@ -207,6 +207,7 @@ Route::middleware(['auth','role:member'])
         Route::get('/courses', [\App\Http\Controllers\Member\CourseLibraryController::class, 'index'])->name('courses.index');
         Route::get('/ebooks', [\App\Http\Controllers\Member\EbookLibraryController::class, 'index'])->name('ebooks.index');
         Route::get('/courses/{course}/learn', [\App\Http\Controllers\Member\CourseStudyController::class, 'show'])->name('courses.learn');
+        Route::post('/courses/{course}/lessons/{lesson}/complete', [\App\Http\Controllers\Member\CourseStudyController::class, 'complete'])->name('courses.lessons.complete');
         Route::get('/courses/{course}/modules/{module}/quiz', [\App\Http\Controllers\Member\QuizController::class, 'show'])->name('courses.modules.quiz.show');
         Route::post('/courses/{course}/modules/{module}/quiz', [\App\Http\Controllers\Member\QuizController::class, 'submit'])->name('courses.modules.quiz.submit');
         Route::view('/notifications', 'pages.member.notifications')->name('notifications');

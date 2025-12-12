@@ -7,13 +7,10 @@
             <!-- Brand -->
             <x-ui.navbar.brand />
 
-            <!-- Links (desktop) + desktop theme toggle slot -->
-            <x-ui.navbar.links>
-                <x-ui.navbar.theme-toggle desktop="true" />
-            </x-ui.navbar.links>
+            <!-- Links (desktop) -->
+            <x-ui.navbar.links />
 
-            <!-- Theme toggle (mobile) -->
-            <x-ui.navbar.theme-toggle />
+            <!-- Theme toggle removed -->
 
             <!-- Auth -->
             <x-ui.navbar.auth />

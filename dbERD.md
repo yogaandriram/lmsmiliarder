@@ -33,6 +33,18 @@ multiple_choice
 essay
 }
 
+Enum subscription_type {
+lifetime
+range
+duration
+}
+
+Enum payout_status {
+pending
+approved
+rejected
+}
+
 Enum discount_type {
 percentage
 fixed
@@ -56,6 +68,7 @@ password varchar [not null, note: 'Kata sandi yang sudah di-hash.']
 avatar_url varchar [note: 'URL ke foto profil pengguna.']
 bio text [note: 'Deskripsi singkat tentang pengguna.']
 role user_role [not null, note: 'Peran pengguna dalam sistem.']
+job_title varchar [note: 'Pekerjaan pengguna (mentor).']
 email_verified_at timestamp [note: 'Penanda waktu kapan email diverifikasi.']
 created_at timestamp [not null, note: 'Waktu pendaftaran.']
 updated_at timestamp [not null, note: 'Waktu terakhir profil diubah.']
@@ -110,6 +123,14 @@ description text [not null, note: 'Deskripsi lengkap kursus.']
 thumbnail_url varchar [note: 'URL gambar thumbnail kursus.']
 price decimal [not null, note: 'Harga kursus.']
 status course_status [not null, note: 'Status publikasi kursus.']
+verification_status verification_status [note: 'Status verifikasi admin.']
+mentor_share_percent int [note: 'Persentase komisi mentor.']
+intro_video_url varchar [note: 'URL video pengantar kursus.']
+subscription_type subscription_type [note: 'Tipe akses (lifetime/range/duration).']
+subscription_start_date timestamp [note: 'Mulai akses untuk tipe range.']
+subscription_end_date timestamp [note: 'Akhir akses untuk tipe range.']
+subscription_duration_value int [note: 'Nilai durasi untuk tipe duration.']
+subscription_duration_unit varchar [note: 'Satuan durasi (hari/bulan).']
 created_at timestamp [not null]
 updated_at timestamp [not null]
 }
@@ -154,6 +175,8 @@ cover_image_url varchar [note: 'URL gambar sampul.']
 file_url varchar [not null, note: 'URL untuk mengunduh file e-book.']
 price decimal [not null, note: 'Harga E-book.']
 status course_status [not null, note: 'Status publikasi E-book.']
+verification_status verification_status [note: 'Status verifikasi admin.']
+mentor_share_percent int [note: 'Persentase komisi mentor.']
 created_at timestamp [not null]
 updated_at timestamp [not null]
 }
@@ -162,11 +185,13 @@ updated_at timestamp [not null]
 
 Table quizzes {
 id bigint [pk, increment]
-lesson_id bigint [not null, note: 'Materi terkait kuis ini.']
+lesson_id bigint [note: 'Materi terkait kuis ini (opsional).']
+module_id bigint [note: 'Modul terkait kuis ini (opsional).']
 title varchar [not null, note: 'Judul kuis.']
 description text [note: 'Instruksi atau deskripsi kuis.']
 time_limit_minutes int [note: 'Batas waktu pengerjaan.']
 created_at timestamp [not null]
+updated_at timestamp [note: 'Waktu terakhir diperbarui.']
 }
 
 Table quiz_questions {
@@ -174,7 +199,7 @@ id bigint [pk, increment]
 quiz_id bigint [not null, note: 'Kuis induk dari pertanyaan ini.']
 question_text text [not null, note: 'Isi pertanyaan.']
 question_type question_type [not null, note: 'Jenis pertanyaan.']
-"order" int [not null, note: 'Urutan pertanyaan.']
+question_order int [not null, note: 'Urutan pertanyaan.']
 }
 
 Table quiz_options {
@@ -202,22 +227,14 @@ group_name varchar [not null, note: 'Nama grup (biasanya sama dengan nama kursus
 created_at timestamp [not null]
 }
 
-Table discussion_threads {
+Table discussion_messages {
 id bigint [pk, increment]
 group_id bigint [not null]
-user_id bigint [not null, note: 'Pembuat thread.']
-title varchar [not null, note: 'Judul topik diskusi.']
-content text [not null, note: 'Isi postingan pertama.']
-is_pinned boolean [not null, default: false, note: 'Untuk menandai topik penting.']
-created_at timestamp [not null]
-}
-
-Table discussion_replies {
-id bigint [pk, increment]
-thread_id bigint [not null]
-user_id bigint [not null, note: 'Pengirim balasan.']
-parent_reply_id bigint [note: 'Untuk balasan berantai (nested).']
-content text [not null, note: 'Isi balasan.']
+user_id bigint [not null]
+content text [note: 'Isi pesan chat']
+file_url varchar [note: 'Lampiran media/file']
+mime_type varchar [note: 'MIME dari lampiran']
+original_name varchar [note: 'Nama file asli']
 created_at timestamp [not null]
 }
 
@@ -268,8 +285,11 @@ admin_bank_account_id bigint [note: 'Rekening tujuan untuk transfer manual.']
 total_amount decimal [not null, note: 'Jumlah total sebelum diskon.']
 discount_amount decimal [not null, default: 0, note: 'Jumlah diskon.']
 final_amount decimal [not null, note: 'Jumlah yang harus dibayar.']
+payable_amount decimal [note: 'Jumlah bayar setelah kode unik.']
+unique_code int [note: 'Kode unik pengurang nominal.']
 payment_method varchar [note: "Metode pembayaran (misal: 'manual_transfer', 'credit_card')."]
 payment_proof_url varchar [note: 'URL bukti pembayaran yang diunggah pengguna.']
+payment_meta json [note: 'Metadata tambahan pembayaran.']
 payment_status payment_status [not null]
 transaction_time timestamp [not null]
 }
@@ -281,6 +301,9 @@ product_type product_type [not null, note: 'Menandakan apakah item ini Course at
 course_id bigint [note: 'Diisi jika product_type adalah "course"']
 ebook_id bigint [note: 'Diisi jika product_type adalah "ebook"']
 price decimal [not null, note: 'Harga produk saat transaksi.']
+effective_price decimal [note: 'Harga efektif setelah diskon proporsional.']
+mentor_earning decimal [note: 'Komisi yang diterima mentor.']
+admin_commission decimal [note: 'Komisi admin untuk item ini.']
 
 note: 'Hanya satu dari course_id atau ebook_id yang boleh diisi per baris.'
 }
@@ -324,21 +347,22 @@ Ref: ebooks.author_id > users.id
 Ref: modules.course_id > courses.id
 Ref: lessons.module_id > modules.id
 Ref: quizzes.lesson_id > lessons.id
+Ref: quizzes.module_id > modules.id
 Ref: quiz_questions.quiz_id > quizzes.id
 Ref: quiz_options.question_id > quiz_questions.id
 Ref: user_quiz_attempts.user_id > users.id
 Ref: user_quiz_attempts.quiz_id > quizzes.id
 Ref: discussion_groups.course_id > courses.id
-Ref: discussion_threads.group_id > discussion_groups.id
-Ref: discussion_threads.user_id > users.id
-Ref: discussion_replies.thread_id > discussion_threads.id
-Ref: discussion_replies.user_id > users.id
-Ref: discussion_replies.parent_reply_id > discussion_replies.id
+Ref: discussion_messages.group_id > discussion_groups.id
+Ref: discussion_messages.user_id > users.id
 Ref: announcements.admin_id > users.id
 Ref: notifications.recipient_id > users.id
 Ref: transactions.user_id > users.id
 Ref: transactions.coupon_id > coupons.id
 Ref: transactions.admin_bank_account_id > admin_bank_accounts.id
+Ref: mentor_commission_payouts.user_id > users.id
+Ref: mentor_commission_payouts.mentor_bank_account_id > mentor_bank_accounts.id
+Ref: mentor_commission_payouts.admin_bank_account_id > admin_bank_accounts.id
 Ref: transaction_details.transaction_id > transactions.id
 Ref: transaction_details.course_id > courses.id
 Ref: transaction_details.ebook_id > ebooks.id
@@ -348,3 +372,36 @@ Ref: user_ebook_library.user_id > users.id
 Ref: user_ebook_library.ebook_id > ebooks.id
 Ref: learning_progress.enrollment_id > enrollments.id
 Ref: learning_progress.lesson_id > lessons.id
+Table mentor_bank_accounts {
+id bigint [pk, increment]
+user_id bigint [not null]
+bank_name varchar [not null]
+account_number varchar [not null]
+account_holder_name varchar [not null]
+is_default boolean [not null, default: false]
+created_at timestamp [not null]
+updated_at timestamp [not null]
+}
+
+Table mentor_commission_payouts {
+id bigint [pk, increment]
+user_id bigint [not null]
+amount decimal [not null]
+status payout_status [not null]
+requested_at timestamp [not null]
+processed_at timestamp [note: 'Waktu pencairan diproses']
+mentor_bank_account_id bigint [note: 'Rekening mentor tujuan payout']
+admin_bank_account_id bigint [note: 'Rekening admin sumber payout']
+proof_url varchar [note: 'URL bukti transfer']
+admin_fee decimal [note: 'Biaya admin saat payout']
+created_at timestamp [not null]
+updated_at timestamp [not null]
+}
+
+Table platform_settings {
+id bigint [pk, increment]
+key varchar [unique, not null]
+value text [not null]
+created_at timestamp [not null]
+updated_at timestamp [not null]
+}
