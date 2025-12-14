@@ -42,5 +42,7 @@
             </div>
         </div>
     </main>
+
+    @include('components.layout.footer')
 </body>
 </html>

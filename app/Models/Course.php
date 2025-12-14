@@ -74,4 +74,12 @@ class Course extends Model
     {
         return $this->hasMany(TransactionDetail::class);
     }
+
+    /**
+     * Get all lessons for the course through modules.
+     */
+    public function lessons()
+    {
+        return $this->hasManyThrough(Lesson::class, Module::class);
+    }
 }

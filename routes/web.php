@@ -22,6 +22,9 @@ Route::get('/', function () {
     return view('home');
 })->name('home');
 
+Route::get('/courses', [PublicCourseController::class, 'index'])->name('public.courses.index');
+Route::view('/about', 'about')->name('about');
+
 // Public Checkout (akses tanpa login)
 Route::get('/checkout/course/{course}', [\App\Http\Controllers\Member\CheckoutController::class, 'course'])->name('checkout.course');
 Route::get('/checkout/ebook/{ebook}', [\App\Http\Controllers\Member\CheckoutController::class, 'ebook'])->name('checkout.ebook');
@@ -30,6 +33,8 @@ Route::get('/checkout/ebook/{ebook}', [\App\Http\Controllers\Member\CheckoutCont
 Route::get('/courses/{slug}', [PublicCourseController::class, 'show'])->name('public.courses.show');
 // Public course preview by author + course slug
 Route::get('/courses/{mentor}/{course}', [PublicCourseController::class, 'showByAuthorCourse'])->name('public.courses.show.by_author');
+// Public ebook preview by slug
+Route::get('/ebooks/{slug}', [\App\Http\Controllers\Public\EbookController::class, 'show'])->name('public.ebooks.show');
 
 // Auth routes
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');

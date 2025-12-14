@@ -1,8 +1,8 @@
 @extends('components.layout.auth')
 
 @section('content')
-<h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100">OTP Verifikasi</h2>
-<p class="text-gray-600 dark:text-gray-400 text-sm">Silakan masukkan kode 6 digit yang dikirim ke email Anda</p>
+<h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100 text-center">OTP Verifikasi</h2>
+<p class="text-gray-600 dark:text-gray-400 text-sm text-center">Silakan masukkan kode 6 digit yang dikirim ke email Anda</p>
 
 @if(session('status'))
     <p class="text-green-600 dark:text-green-400 text-sm">{{ session('status') }}</p>
@@ -28,19 +28,22 @@
         <p class="text-red-400 text-sm">{{ $message }}</p>
     @enderror
 
-    <x-ui.btn-primary type="submit" class="w-full justify-center">Kirim Link</x-ui.btn-primary>
+    <x-ui.btn-primary type="submit" class="w-full justify-center mb-4">Kirim Link</x-ui.btn-primary>
 </form>
 
-<div class="flex items-center justify-between mt-3">
-    <span class="text-gray-600 dark:text-gray-400 text-sm">Tidak Menerima OTP?</span>
-    <form id="resendForm" method="POST" action="{{ route('otp.request') }}" class="flex items-center gap-3">
+<div class="space-y-3 mt-4">
+    <div class="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
+        <span>Tidak Menerima OTP?</span>
+        <span id="countdownText" class="font-medium">Kirim Ulang Dalam 0:{{ str_pad(($remainingSeconds ?? 60) % 60, 2, '0', STR_PAD_LEFT) }}</span>
+    </div>
+
+    <form id="resendForm" method="POST" action="{{ route('otp.request') }}">
         @csrf
         <input type="hidden" name="email" value="{{ $email ?? old('email') }}" />
         @if(isset($return))
           <input type="hidden" name="return" value="{{ $return }}" />
         @endif
-        <x-ui.btn-secondary type="submit" size="sm" class="disabled:opacity-50 justify-center" id="resendBtn" data-seconds="{{ isset($remainingSeconds) ? max(0, (int)$remainingSeconds) : 60 }}" disabled>Kirim Ulang OTP</x-ui.btn-secondary>
-        <span class="text-gray-600 dark:text-gray-400 text-sm" id="countdownText">Kirim Ulang Dalam 0:{{ str_pad(($remainingSeconds ?? 60) % 60, 2, '0', STR_PAD_LEFT) }}</span>
+        <x-ui.btn-secondary type="submit" size="sm" class="w-full justify-center disabled:opacity-50" id="resendBtn" data-seconds="{{ isset($remainingSeconds) ? max(0, (int)$remainingSeconds) : 60 }}" disabled>Kirim Ulang OTP</x-ui.btn-secondary>
     </form>
 </div>
 

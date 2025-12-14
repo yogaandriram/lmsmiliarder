@@ -5,7 +5,7 @@
 <div class="max-w-5xl mx-auto space-y-6">
   <div class="flex items-center justify-between">
     <h2 class="text-2xl font-semibold">Checkout Kursus</h2>
-    <x-ui.btn-secondary href="{{ route('public.courses.show.by_author', [\Illuminate\Support\Str::slug($course->author->name ?? 'mentor'), $course->slug]) }}" icon="fa-solid fa-arrow-left">Kembali</x-ui.btn-secondary>
+    <x-ui.btn-secondary href="{{ route('public.courses.show', $course->slug) }}" icon="fa-solid fa-arrow-left">Kembali</x-ui.btn-secondary>
   </div>
 
   <div class="grid grid-cols-1 place-items-center gap-6">

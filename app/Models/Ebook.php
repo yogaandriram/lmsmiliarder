@@ -15,6 +15,7 @@ class Ebook extends Model
 
     protected $casts = [
         'mentor_share_percent' => 'integer',
+        'verified_at' => 'datetime',
     ];
 
     /**

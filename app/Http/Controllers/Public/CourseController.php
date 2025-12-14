@@ -10,6 +10,25 @@ use Illuminate\Support\Str;
 
 class CourseController extends Controller
 {
+    public function index()
+    {
+        $q = request('q');
+        $courses = Course::where('status', 'published')
+            ->when($q, function ($query, $q) {
+                return $query->where('title', 'like', "%{$q}%");
+            })
+            ->with(['author', 'category'])
+            ->withCount(['enrollments', 'modules'])
+            ->withSum('lessons as total_duration', 'duration_minutes')
+            ->latest()
+            ->paginate(12);
+
+        $categories = \App\Models\Category::all();
+        $tags = \App\Models\Tag::all();
+
+        return view('courses', compact('courses', 'categories', 'tags'));
+    }
+
     public function show(string $slug)
     {
         $course = Course::with(['author','category','tags','modules.lessons'])
